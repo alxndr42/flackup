@@ -134,7 +134,7 @@ setup(
     # platform.
     entry_points={  # Optional
         'console_scripts': [
-            'flackup=flackup.flackup:main',
+            'flackup=flackup.main:main',
         ],
     },
 )
