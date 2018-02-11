@@ -44,7 +44,7 @@ class FileInfo():
     def __init__(self, filename):
         self.filename = filename
         self.parse_ok = False
-        self.parse_msg = None
+        self.parse_exception = None
         self.cuesheet = None
         self.comments = None
         self.parse()
@@ -57,10 +57,11 @@ class FileInfo():
             else:
                 self.cuesheet = None
             self.parse_ok = True
-            self.parse_msg = None
+            self.parse_exception = None
         except Exception as e:
             self.parse_ok = False
-            self.parse_msg = str(e)
+            self.parse_exception = e
+            self.cuesheet = None
 
 
 class MusicBrainz():

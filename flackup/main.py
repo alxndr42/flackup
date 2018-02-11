@@ -14,7 +14,7 @@ def main():
         print(filename)
         file = FileInfo(filename)
         if not file.parse_ok:
-            print('- Parse error (%s)' % file.parse_msg)
+            print('- Parse error (%s)' % file.parse_exception)
             continue
         if file.cuesheet is None:
             print('- No cuesheet')
