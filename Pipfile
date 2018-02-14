@@ -9,6 +9,9 @@ verify_ssl = true
 
 musicbrainzngs = "*"
 mutagen = "*"
+pytest = "*"
+pytest-datadir = "*"
+pytest-runner = "*"
 
 
 [dev-packages]

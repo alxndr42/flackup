@@ -42,7 +42,7 @@ class FileInfo():
     """Read and write FLAC metadata."""
 
     def __init__(self, filename):
-        self.filename = filename
+        self.filename = str(filename)
         self.parse_ok = False
         self.parse_exception = None
         self.cuesheet = None
