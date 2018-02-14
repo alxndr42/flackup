@@ -1,4 +1,4 @@
-from flackup.metadata import FileInfo
+from flackup.fileinfo import FileInfo
 
 
 class TestFileInfo(object):

@@ -1,6 +1,7 @@
 import sys
 
-from flackup.metadata import FileInfo, MusicBrainz
+from flackup.fileinfo import FileInfo
+from flackup.musicbrainz import MusicBrainz
 
 
 def main():
