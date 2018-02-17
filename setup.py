@@ -135,6 +135,7 @@ setup(
     entry_points={  # Optional
         'console_scripts': [
             'flackup=flackup.main:main',
+            'flackup-analyze=flackup.main_analyze:main',
         ],
     },
 
