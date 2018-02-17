@@ -72,6 +72,13 @@ class Tags(object):
         prefix = 'TRACK_%02d_' % number
         return self._collect_tags(prefix, *FLACKUP_TAGS)
 
+    def update_album(self, tags):
+        return self._update_tags(tags, '', *FLACKUP_TAGS)
+
+    def update_track(self, number, tags):
+        prefix = 'TRACK_%02d_' % number
+        return self._update_tags(tags, prefix, *FLACKUP_TAGS)
+
     def _collect_tags(self, prefix, *args):
         result = {}
         for name in args:
@@ -79,6 +86,24 @@ class Tags(object):
             if key in self._tags:
                 result[name] = self._tags[key][0]
         return result
+
+    def _update_tags(self, tags, prefix, *args):
+        changed = False
+        for name in args:
+            key = prefix + name
+            if name not in tags and key not in self._tags:
+                continue
+            elif name in tags and key not in self._tags:
+                self._tags[key] = tags[name]
+                changed = True
+            elif name not in tags and key in self._tags:
+                del self._tags[key]
+                changed = True
+            elif tags[name] != self._tags[key][0]:
+                del self._tags[key]
+                self._tags[key] = tags[name]
+                changed = True
+        return changed
 
 
 class FileInfo(object):
@@ -108,3 +133,7 @@ class FileInfo(object):
             self.parse_exception = e
             self.cuesheet = None
             self.tags = None
+
+    def update(self):
+        self._flac.save()
+        self.parse()

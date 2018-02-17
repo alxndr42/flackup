@@ -59,21 +59,84 @@ class TestTags(object):
 
     def test_tagged(self, datadir):
         """Test reading a tagged FLAC file."""
-        def assert_track(tags, title, hide, performer):
-            assert tags.get('TITLE') == title
-            assert tags.get('HIDE') == hide
-            assert tags.get('PERFORMER') == performer
-
         file = FileInfo(datadir / 'tagged.flac')
         tags = file.tags
 
         album = tags.album_tags()
-        assert album.get('TITLE') == 'Test Album'
-        assert album.get('ARTIST') == 'Test Artist'
-        assert album.get('GENRE') == 'Test'
-        assert album.get('DATE') == '2018'
         assert 'FOO' not in album
+        self.assert_album(album, 'Test Album', 'Test Artist', 'Test', '2018')
+        self.assert_track(tags.track_tags(1), 'Track 1', None, None)
+        self.assert_track(tags.track_tags(2), 'Track 2', None, None)
+        self.assert_track(tags.track_tags(3), 'Track 3', 'yes', 'Terrible')
 
-        assert_track(tags.track_tags(1), 'Track 1', None, None)
-        assert_track(tags.track_tags(2), 'Track 2', None, None)
-        assert_track(tags.track_tags(3), 'Track 3', 'yes', 'Terrible')
+    def test_update_untagged(self, datadir):
+        """Test updating an untagged FLAC file."""
+        file = FileInfo(datadir / 'test.flac')
+        tags = file.tags
+
+        album = tags.album_tags()
+        album['TITLE'] = 'Title'
+        album['ARTIST'] = 'Artist'
+        assert tags.update_album(album)
+
+        track = tags.track_tags(1)
+        track['TITLE'] = 'Track One'
+        assert tags.update_track(1, track)
+
+        track = tags.track_tags(2)
+        assert not tags.update_track(2, track)
+
+        track = tags.track_tags(3)
+        track['HIDE'] = 'yes'
+        track['PERFORMER'] = 'Terrible'
+        assert tags.update_track(3, track)
+
+        file.update()
+        file = FileInfo(datadir / 'test.flac')
+        tags = file.tags
+        self.assert_album(tags.album_tags(), 'Title', 'Artist', None, None)
+        self.assert_track(tags.track_tags(1), 'Track One', None, None)
+        self.assert_track(tags.track_tags(2), None, None, None)
+        self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
+
+    def test_update_tagged(self, datadir):
+        """Test updating a tagged FLAC file."""
+        file = FileInfo(datadir / 'tagged.flac')
+        tags = file.tags
+
+        album = tags.album_tags()
+        album['TITLE'] = 'Title'
+        album['ARTIST'] = 'Artist'
+        assert tags.update_album(album)
+
+        track = tags.track_tags(1)
+        track['TITLE'] = 'Track One'
+        assert tags.update_track(1, track)
+
+        track = tags.track_tags(2)
+        assert not tags.update_track(2, track)
+
+        track = tags.track_tags(3)
+        del track['TITLE']
+        assert tags.update_track(3, track)
+
+        file.update()
+        file = FileInfo(datadir / 'tagged.flac')
+        tags = file.tags
+        self.assert_album(tags.album_tags(), 'Title', 'Artist', 'Test', '2018')
+        self.assert_track(tags.track_tags(1), 'Track One', None, None)
+        self.assert_track(tags.track_tags(2), 'Track 2', None, None)
+        self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
+
+    @staticmethod
+    def assert_album(tags, title, artist, genre, date):
+        assert tags.get('TITLE') == title
+        assert tags.get('ARTIST') == artist
+        assert tags.get('GENRE') == genre
+        assert tags.get('DATE') == date
+
+    @staticmethod
+    def assert_track(tags, title, hide, performer):
+        assert tags.get('TITLE') == title
+        assert tags.get('HIDE') == hide
+        assert tags.get('PERFORMER') == performer
