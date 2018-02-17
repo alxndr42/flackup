@@ -9,15 +9,15 @@ FLACKUP_TAGS = ['TITLE', 'ARTIST', 'PERFORMER', 'GENRE', 'DATE', 'HIDE']
 
 """A subset of FLAC cue sheet track data.
 
-See: https://xiph.org/flac/format.html#cuesheet_track
+See also: https://xiph.org/flac/format.html#cuesheet_track
 """
 CueSheetTrack = namedtuple('CueSheetTrack', 'number offset type')
 
 
-class CueSheet():
+class CueSheet(object):
     """A subset of FLAC cue sheet data.
 
-    See: https://xiph.org/flac/format.html#metadata_block_cuesheet
+    See also: https://xiph.org/flac/format.html#metadata_block_cuesheet
     """
 
     def __init__(self, mutagen_cuesheet):
@@ -81,7 +81,7 @@ class Tags(object):
         return result
 
 
-class FileInfo():
+class FileInfo(object):
     """Read and write FLAC metadata."""
 
     def __init__(self, filename):

@@ -6,27 +6,27 @@ class TestFileInfo(object):
 
     def test_init(self, datadir):
         """Call the constructor with a valid FLAC file."""
-        info = FileInfo(datadir / 'test.flac')
-        assert info.parse_ok == True
-        assert info.parse_exception is None
-        assert info.cuesheet is not None
-        assert info.tags is not None
+        file = FileInfo(datadir / 'test.flac')
+        assert file.parse_ok == True
+        assert file.parse_exception is None
+        assert file.cuesheet is not None
+        assert file.tags is not None
 
     def test_init_empty(self, datadir):
         """Call the constructor with an empty FLAC file."""
-        info = FileInfo(datadir / 'empty.flac')
-        assert info.parse_ok == True
-        assert info.parse_exception is None
-        assert info.cuesheet is None
-        assert info.tags is None
+        file = FileInfo(datadir / 'empty.flac')
+        assert file.parse_ok == True
+        assert file.parse_exception is None
+        assert file.cuesheet is None
+        assert file.tags is None
 
     def test_init_invalid(self, datadir):
         """Call the constructor with an invalid FLAC file."""
-        info = FileInfo(datadir / 'invalid.flac')
-        assert info.parse_ok == False
-        assert info.parse_exception is not None
-        assert info.cuesheet is None
-        assert info.tags is None
+        file = FileInfo(datadir / 'invalid.flac')
+        assert file.parse_ok == False
+        assert file.parse_exception is not None
+        assert file.cuesheet is None
+        assert file.tags is None
 
 
 class TestCueSheet(object):
@@ -34,8 +34,8 @@ class TestCueSheet(object):
 
     def test_cuesheet(self, datadir):
         """Test with a valid FLAC file."""
-        info = FileInfo(datadir / 'test.flac')
-        cuesheet = info.cuesheet
+        file = FileInfo(datadir / 'test.flac')
+        cuesheet = file.cuesheet
         assert cuesheet is not None
         assert cuesheet.is_cd
         assert cuesheet.lead_in == 88200
@@ -51,10 +51,10 @@ class TestTags(object):
 
     def test_untagged(self, datadir):
         """Test reading an untagged FLAC file."""
-        info = FileInfo(datadir / 'test.flac')
-        tags = info.tags
+        file = FileInfo(datadir / 'test.flac')
+        tags = file.tags
         assert not tags.album_tags()
-        for number in info.cuesheet.audio_track_numbers:
+        for number in file.cuesheet.audio_track_numbers:
             assert not tags.track_tags(number)
 
     def test_tagged(self, datadir):
@@ -64,8 +64,8 @@ class TestTags(object):
             assert tags.get('HIDE') == hide
             assert tags.get('PERFORMER') == performer
 
-        info = FileInfo(datadir / 'tagged.flac')
-        tags = info.tags
+        file = FileInfo(datadir / 'tagged.flac')
+        tags = file.tags
 
         album = tags.album_tags()
         assert album.get('TITLE') == 'Test Album'

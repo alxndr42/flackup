@@ -8,7 +8,7 @@ import musicbrainzngs as mb_client
 from flackup import VERSION
 
 
-class MusicBrainz():
+class MusicBrainz(object):
     """Perform MusicBrainz queries."""
 
     def __init__(self):
