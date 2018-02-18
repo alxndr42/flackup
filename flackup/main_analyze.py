@@ -4,9 +4,21 @@ from flackup.fileinfo import FileInfo
 
 
 def main():
-    """Analyze FLAC files."""
+    """Analyze FLAC files.
+
+    Usage: flackup-analyze <flac_file> ...
+
+    For each file, prints a list of flags followed by the filename.
+
+    Flags:
+    - O: The file parsed successfully.
+    - C: A cue sheet is present.
+    - A: Album-level tags are present (any number).
+    - T: Track-level tags are present (any number).
+    - P: Pictures are present (any number).
+    """
     if len(sys.argv) == 1:
-        print('Usage: flackup-analyze.py <flac_file> ...')
+        print(main.__doc__)
         return
 
     for filename in sys.argv[1:]:

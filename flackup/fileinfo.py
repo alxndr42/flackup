@@ -17,6 +17,9 @@ CueSheetTrack = namedtuple('CueSheetTrack', 'number offset type')
 class CueSheet(object):
     """A subset of FLAC cue sheet data.
 
+    Variables:
+    - tracks: List of CueSheetTrack instances, including lead-out.
+
     See also: https://xiph.org/flac/format.html#metadata_block_cuesheet
     """
 
@@ -29,14 +32,17 @@ class CueSheet(object):
 
     @property
     def is_cd(self):
+        """Return True if this is an audio CD cue sheet."""
         return self._mcs.compact_disc
 
     @property
     def lead_in(self):
+        """Return the number of lead-in samples."""
         return self._mcs.lead_in_samples
 
     @property
     def audio_track_numbers(self):
+        """Return a list of audio track numbers, excluding lead-out."""
         def is_audio(track):
             return track.type == 0 and track.number != 170
 
@@ -59,23 +65,33 @@ class Tags(object):
     See also: https://www.xiph.org/vorbis/doc/v-comment.html
     """
 
-    def __init__(self, vorbis_tags):
-        if vorbis_tags is not None:
-            self._tags = vorbis_tags
+    def __init__(self, mutagen_tags):
+        if mutagen_tags is not None:
+            self._tags = mutagen_tags
         else:
             self._tags = {}
 
     def album_tags(self):
+        """Return a dictionary of album-level tags."""
         return self._collect_tags('', *FLACKUP_TAGS)
 
     def track_tags(self, number):
+        """Return a dictionary of track-level tags."""
         prefix = 'TRACK_%02d_' % number
         return self._collect_tags(prefix, *FLACKUP_TAGS)
 
     def update_album(self, tags):
+        """Update album-level tags.
+
+        Returns True if anything changed.
+        """
         return self._update_tags(tags, '', *FLACKUP_TAGS)
 
     def update_track(self, number, tags):
+        """Update track-level tags.
+
+        Returns True if anything changed.
+        """
         prefix = 'TRACK_%02d_' % number
         return self._update_tags(tags, prefix, *FLACKUP_TAGS)
 
@@ -107,7 +123,16 @@ class Tags(object):
 
 
 class FileInfo(object):
-    """Read and write FLAC metadata."""
+    """Read and write FLAC metadata.
+
+    Variables:
+    - filename: The FLAC file.
+    - parse_ok: True if the file was parsed successfully.
+                If False, cuesheet and tags will be None.
+    - parse_exception: The exception raised during parsing, or None.
+    - cuesheet: The file's CueSheet, or None.
+    - tags: The file's Tags, or None.
+    """
 
     def __init__(self, filename):
         self.filename = str(filename)
@@ -118,6 +143,7 @@ class FileInfo(object):
         self.parse()
 
     def parse(self):
+        """Read the FLAC file and update the variables."""
         try:
             self._flac = FLAC(self.filename)
             if self._flac.cuesheet is not None:
@@ -135,5 +161,6 @@ class FileInfo(object):
             self.tags = None
 
     def update(self):
+        """Save the current variables and re-parse the FLAC file."""
         self._flac.save()
         self.parse()

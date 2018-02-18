@@ -5,9 +5,12 @@ from flackup.musicbrainz import MusicBrainz
 
 
 def main():
-    """Perform MusicBrainz lookups using FLAC cuesheets."""
+    """Perform MusicBrainz lookups using FLAC cuesheets.
+
+    Usage: flackup <flac_file> ...
+    """
     if len(sys.argv) == 1:
-        print('Usage: flackup.py <flac_file> ...')
+        print(main.__doc__)
         return
 
     mb = MusicBrainz()
