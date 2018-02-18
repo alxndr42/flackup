@@ -131,15 +131,11 @@ class FileInfo(object):
                 If False, cuesheet and tags will be None.
     - parse_exception: The exception raised during parsing, or None.
     - cuesheet: The file's CueSheet, or None.
-    - tags: The file's Tags, or None.
+    - tags: The file's Tags.
     """
 
     def __init__(self, filename):
         self.filename = str(filename)
-        self.parse_ok = False
-        self.parse_exception = None
-        self.cuesheet = None
-        self.tags = None
         self.parse()
 
     def parse(self):
@@ -148,10 +144,9 @@ class FileInfo(object):
             self._flac = FLAC(self.filename)
             if self._flac.cuesheet is not None:
                 self.cuesheet = CueSheet(self._flac.cuesheet)
-                self.tags = Tags(self._flac.tags)
             else:
                 self.cuesheet = None
-                self.tags = None
+            self.tags = Tags(self._flac.tags)
             self.parse_ok = True
             self.parse_exception = None
         except Exception as e:

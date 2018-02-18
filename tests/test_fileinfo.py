@@ -18,7 +18,7 @@ class TestFileInfo(object):
         assert file.parse_ok == True
         assert file.parse_exception is None
         assert file.cuesheet is None
-        assert file.tags is None
+        assert file.tags is not None
 
     def test_init_invalid(self, datadir):
         """Call the constructor with an invalid FLAC file."""
