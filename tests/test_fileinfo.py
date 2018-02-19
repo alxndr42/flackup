@@ -11,6 +11,7 @@ class TestFileInfo(object):
         assert file.parse_exception is None
         assert file.cuesheet is not None
         assert file.tags is not None
+        assert file.pictures() is not None
 
     def test_init_empty(self, datadir):
         """Call the constructor with an empty FLAC file."""
@@ -19,6 +20,7 @@ class TestFileInfo(object):
         assert file.parse_exception is None
         assert file.cuesheet is None
         assert file.tags is not None
+        assert file.pictures() is not None
 
     def test_init_invalid(self, datadir):
         """Call the constructor with an invalid FLAC file."""
@@ -27,6 +29,25 @@ class TestFileInfo(object):
         assert file.parse_exception is not None
         assert file.cuesheet is None
         assert file.tags is None
+        assert file.pictures() is None
+
+    def test_read_picture(self, datadir):
+        """Test reading a picture."""
+        file = FileInfo(datadir / 'tagged.flac')
+        with open(str(datadir / 'cover.png'), 'rb') as cover:
+            data = cover.read()
+        self.assert_picture(file, 3, 'image/png', 128, 128, 24, data)
+
+    @staticmethod
+    def assert_picture(fileinfo, type_, mime, width, height, depth, data):
+        picture = fileinfo.get_picture(type_)
+        assert picture is not None
+        assert picture.type == type_
+        assert picture.mime == mime
+        assert picture.width == width
+        assert picture.height == height
+        assert picture.depth == depth
+        assert picture.data == data
 
 
 class TestCueSheet(object):

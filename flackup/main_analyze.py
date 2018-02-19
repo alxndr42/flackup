@@ -39,6 +39,8 @@ def main():
                         break
             if file.tags.album_tags():
                 flag_album_tags = 'A'
+            if file.pictures():
+                flag_pictures = 'P'
 
         result = '%s%s%s%s%s %s' % (
             flag_parse_ok,

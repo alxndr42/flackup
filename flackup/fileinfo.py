@@ -122,6 +122,13 @@ class Tags(object):
         return changed
 
 
+"""A subset of FLAC picture data.
+
+See also: https://xiph.org/flac/format.html#metadata_block_picture
+"""
+Picture = namedtuple('Picture', 'type mime width height depth data')
+
+
 class FileInfo(object):
     """Read and write FLAC metadata.
 
@@ -132,6 +139,8 @@ class FileInfo(object):
     - parse_exception: The exception raised during parsing, or None.
     - cuesheet: The file's CueSheet, or None.
     - tags: The file's Tags.
+
+    This class supports only one picture per type.
     """
 
     def __init__(self, filename):
@@ -156,6 +165,34 @@ class FileInfo(object):
             self.tags = None
 
     def update(self):
-        """Save the current variables and re-parse the FLAC file."""
+        """Save the current metadata and re-parse the FLAC file."""
         self._flac.save()
         self.parse()
+
+    def pictures(self):
+        """Return a tuple of Pictures, or None."""
+        if self.parse_ok:
+            return tuple(self._picture(p) for p in self._flac.pictures)
+        else:
+            return None
+
+    def get_picture(self, type_):
+        """Return a Picture with the given type, or None."""
+        result = None
+        if self.parse_ok:
+            matches = [p for p in self._flac.pictures if p.type == type_]
+            if matches:
+                result = self._picture(matches[0])
+        return result
+
+    @staticmethod
+    def _picture(mutagen_picture):
+        """Create a Picture from a Mutagen Picture."""
+        return Picture(
+            mutagen_picture.type,
+            mutagen_picture.mime,
+            mutagen_picture.width,
+            mutagen_picture.height,
+            mutagen_picture.depth,
+            mutagen_picture.data
+        )
