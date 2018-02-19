@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from mutagen.flac import FLAC
+from mutagen.flac import FLAC, Picture as MutagenPicture
 
 
 """Tag names supported for albums and tracks."""
@@ -172,22 +172,54 @@ class FileInfo(object):
     def pictures(self):
         """Return a tuple of Pictures, or None."""
         if self.parse_ok:
-            return tuple(self._picture(p) for p in self._flac.pictures)
+            return tuple(self._picture_m2f(p) for p in self._flac.pictures)
         else:
             return None
 
     def get_picture(self, type_):
-        """Return a Picture with the given type, or None."""
+        """Return the Picture of the given type, or None."""
         result = None
         if self.parse_ok:
             matches = [p for p in self._flac.pictures if p.type == type_]
             if matches:
-                result = self._picture(matches[0])
+                result = self._picture_m2f(matches[0])
         return result
 
+    def set_picture(self, type_, mime, width, height, depth, data):
+        """Set the picture of the given type.
+
+        Returns True if anything changed.
+        """
+        changed = False
+        old = self.get_picture(type_)
+        new = Picture(type_, mime, width, height, depth, data)
+        if old != new:
+            pictures = [p for p in self._flac.pictures if p.type != type_]
+            pictures.append(self._picture_f2m(new))
+            self._flac.clear_pictures()
+            for picture in pictures:
+                self._flac.add_picture(picture)
+            changed = True
+        return changed
+
+    def remove_picture(self, type_):
+        """Remove the picture of the given type.
+
+        Returns True if anything changed.
+        """
+        changed = False
+        matches = [p for p in self._flac.pictures if p.type == type_]
+        if matches:
+            pictures = [p for p in self._flac.pictures if p.type != type_]
+            self._flac.clear_pictures()
+            for picture in pictures:
+                self._flac.add_picture(picture)
+            changed = True
+        return changed
+
     @staticmethod
-    def _picture(mutagen_picture):
-        """Create a Picture from a Mutagen Picture."""
+    def _picture_m2f(mutagen_picture):
+        """Create a Flackup Picture from a Mutagen Picture."""
         return Picture(
             mutagen_picture.type,
             mutagen_picture.mime,
@@ -196,3 +228,15 @@ class FileInfo(object):
             mutagen_picture.depth,
             mutagen_picture.data
         )
+
+    @staticmethod
+    def _picture_f2m(flackup_picture):
+        """Create a Mutagen Picture from a Flackup Picture."""
+        picture = MutagenPicture()
+        picture.type = flackup_picture.type
+        picture.mime = flackup_picture.mime
+        picture.width = flackup_picture.width
+        picture.height = flackup_picture.height
+        picture.depth = flackup_picture.depth
+        picture.data = flackup_picture.data
+        return picture

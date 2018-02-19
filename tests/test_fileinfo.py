@@ -38,6 +38,24 @@ class TestFileInfo(object):
             data = cover.read()
         self.assert_picture(file, 3, 'image/png', 128, 128, 24, data)
 
+    def test_set_picture(self, datadir):
+        """Test setting a picture."""
+        file = FileInfo(datadir / 'empty.flac')
+        with open(str(datadir / 'cover.png'), 'rb') as cover:
+            data = cover.read()
+        assert file.set_picture(3, 'image/png', 128, 128, 24, data)
+        assert not file.set_picture(3, 'image/png', 128, 128, 24, data)
+        file.update()
+        self.assert_picture(file, 3, 'image/png', 128, 128, 24, data)
+
+    def test_remove_picture(self, datadir):
+        """Test removing a picture."""
+        file = FileInfo(datadir / 'tagged.flac')
+        assert file.remove_picture(3)
+        assert not file.remove_picture(3)
+        file.update()
+        assert file.get_picture(3) is None
+
     @staticmethod
     def assert_picture(fileinfo, type_, mime, width, height, depth, data):
         picture = fileinfo.get_picture(type_)
