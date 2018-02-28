@@ -36,7 +36,13 @@ def main():
             continue
 
         for match in matches:
-            parts = [match['id'], match['artist'], match['title']]
-            if 'barcode' in match:
-                parts.append(match['barcode'])
+            parts = [match['id'], match['artist']]
+            status = match.get('status', 'Unknown')
+            if status == 'Official':
+                parts.append(match['title'])
+            else:
+                parts.append('%s (%s)' % (match['title'], status))
+            barcode = match.get('barcode')
+            if barcode:
+                parts.append(barcode)
             print('-', ' | '.join(parts))

@@ -58,7 +58,7 @@ class MusicBrainz(object):
                 pass # no matches
             else:
                 raise e
-        return result
+        return sorted(result, key=_release_key)
 
     # TODO This doesn't work for multi-session CDs
     # https://musicbrainz.org/doc/Disc_ID_Calculation
@@ -126,3 +126,21 @@ class MusicBrainz(object):
         elif 'release-list' in response:
             releases = response['release-list']
         return [release(r) for r in releases]
+
+
+def _release_key(release):
+    """Create a comparison key from the release."""
+    key = []
+    key.append(release['artist'].casefold())
+    key.append(release['title'].casefold())
+    status = release.get('status', 'Unknown')
+    if status == 'Official':
+        key.append(0)
+    elif status == 'Bootleg':
+        key.append(2)
+    else:
+        key.append(1)
+    key.append(release.get('medium-count', 99))
+    key.append(release.get('date', '9999'))
+    key.append(release.get('barcode', '9999999999999'))
+    return tuple(key)
