@@ -26,13 +26,17 @@ def main():
 
         matches = None
         try:
-            matches = mb.lookup_releases(file.cuesheet)
+            matches = mb.lookup_by_cuesheet(file.cuesheet)
         except Exception as e:
             print('- Lookup error (%s)' % e)
             continue
 
-        if matches:
-            for match in matches:
-                print('- %s (%s)' % match)
-        else:
+        if not matches:
             print('- No matches')
+            continue
+
+        for match in matches:
+            parts = [match['id'], match['artist'], match['title']]
+            if 'barcode' in match:
+                parts.append(match['barcode'])
+            print('-', ' | '.join(parts))
