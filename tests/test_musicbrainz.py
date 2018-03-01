@@ -7,7 +7,7 @@ class TestMusicBrainz(object):
     def test_discid_lookup(self):
         """Test a lookup by disc ID."""
         mb = MusicBrainz()
-        releases = mb.lookup_by_discid('RHNAnAo97C4V.gbmOWsLQwXfTOA-')
+        releases = mb.releases_by_discid('RHNAnAo97C4V.gbmOWsLQwXfTOA-')
         self.assert_release(
             releases,
             '7542431b-0fab-4443-a994-5fa98593da02',
@@ -21,7 +21,7 @@ class TestMusicBrainz(object):
         """Test a lookup by TOC string."""
         mb = MusicBrainz()
         toc = '1 10 176790 150 20543 41300 53113 75608 91578 103028 120483 143800 159908'
-        releases = mb.lookup_by_discid(None, toc)
+        releases = mb.releases_by_discid(None, toc)
         self.assert_release(
             releases,
             '2c62e70e-5f2a-4aaf-913f-e29d212cc64c',

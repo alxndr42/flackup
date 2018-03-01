@@ -29,13 +29,13 @@ class MusicBrainz(object):
     def __init__(self):
         mb_client.set_useragent('flackup', VERSION)
 
-    def lookup_by_cuesheet(self, cuesheet):
+    def releases_by_cuesheet(self, cuesheet):
         """Lookup releases by CueSheet."""
         discid = self._create_discid(cuesheet)
         toc = self._create_toc(cuesheet)
-        return self.lookup_by_discid(discid, toc)
+        return self.releases_by_discid(discid, toc)
 
-    def lookup_by_discid(self, discid, toc=None):
+    def releases_by_discid(self, discid, toc=None):
         """Lookup releases by MusicBrainz disc ID or TOC string."""
         if not discid and not toc:
             return []
@@ -129,7 +129,7 @@ class MusicBrainz(object):
 
 
 def _release_key(release):
-    """Create a comparison key from the release."""
+    """Create a comparison key from a release."""
     key = []
     key.append(release['artist'].casefold())
     key.append(release['title'].casefold())

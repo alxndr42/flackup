@@ -26,7 +26,7 @@ def main():
 
         matches = None
         try:
-            matches = mb.lookup_by_cuesheet(file.cuesheet)
+            matches = mb.releases_by_cuesheet(file.cuesheet)
         except Exception as e:
             print('- Lookup error (%s)' % e)
             continue
