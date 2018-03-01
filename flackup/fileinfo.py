@@ -3,8 +3,14 @@ from collections import namedtuple
 from mutagen.flac import FLAC, Picture as MutagenPicture
 
 
-"""Tag names supported for albums and tracks."""
-FLACKUP_TAGS = ['TITLE', 'ARTIST', 'PERFORMER', 'GENRE', 'DATE', 'HIDE']
+"""Tag names for both albums and tracks."""
+_COMMON_TAGS = ['ARTIST', 'GENRE', 'HIDE', 'PERFORMER', 'TITLE']
+
+"""Album-level tag names."""
+ALBUM_TAGS = _COMMON_TAGS + ['DATE', 'RELEASE_MBID']
+
+"""Track-level tag names."""
+TRACK_TAGS = _COMMON_TAGS
 
 """Flackup tags version number."""
 _VERSION_NUMBER = 1
@@ -58,14 +64,6 @@ class CueSheet(object):
 class Tags(object):
     """Flackup album and track tags.
 
-    Supported tag names for albums and tracks:
-    - TITLE
-    - ARTIST
-    - PERFORMER
-    - GENRE
-    - DATE
-    - HIDE ('yes' to ignore for conversion/playback)
-
     This class supports only one string value per tag.
 
     See also: https://www.xiph.org/vorbis/doc/v-comment.html
@@ -79,19 +77,19 @@ class Tags(object):
 
     def album_tags(self):
         """Return a dictionary of album-level tags."""
-        return self._collect_tags('', *FLACKUP_TAGS)
+        return self._collect_tags('', *ALBUM_TAGS)
 
     def track_tags(self, number):
         """Return a dictionary of track-level tags."""
         prefix = 'TRACK_%02d_' % number
-        return self._collect_tags(prefix, *FLACKUP_TAGS)
+        return self._collect_tags(prefix, *TRACK_TAGS)
 
     def update_album(self, tags):
         """Update album-level tags.
 
         Returns True if anything changed.
         """
-        return self._update_tags(tags, '', *FLACKUP_TAGS)
+        return self._update_tags(tags, '', *ALBUM_TAGS)
 
     def update_track(self, number, tags):
         """Update track-level tags.
@@ -99,7 +97,7 @@ class Tags(object):
         Returns True if anything changed.
         """
         prefix = 'TRACK_%02d_' % number
-        return self._update_tags(tags, prefix, *FLACKUP_TAGS)
+        return self._update_tags(tags, prefix, *TRACK_TAGS)
 
     def _collect_tags(self, prefix, *args):
         result = {}
