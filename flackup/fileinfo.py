@@ -6,6 +6,12 @@ from mutagen.flac import FLAC, Picture as MutagenPicture
 """Tag names supported for albums and tracks."""
 FLACKUP_TAGS = ['TITLE', 'ARTIST', 'PERFORMER', 'GENRE', 'DATE', 'HIDE']
 
+"""Flackup tags version number."""
+_VERSION_NUMBER = 1
+
+"""Tag name of the Flackup tags version number."""
+_VERSION_TAG = 'FLACKUP_VERSION'
+
 
 """A subset of FLAC cue sheet track data.
 
@@ -119,6 +125,8 @@ class Tags(object):
                 del self._tags[key]
                 self._tags[key] = tags[name]
                 changed = True
+        if changed and _VERSION_TAG not in self._tags:
+            self._tags[_VERSION_TAG] = str(_VERSION_NUMBER)
         return changed
 
 
