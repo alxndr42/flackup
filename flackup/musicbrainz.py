@@ -31,55 +31,77 @@ class MusicBrainz(object):
 
     def releases_by_cuesheet(self, cuesheet):
         """Lookup releases by CueSheet."""
-        discid = self._create_discid(cuesheet)
-        toc = self._create_toc(cuesheet)
-        return self.releases_by_discid(discid, toc)
+        disc = MusicBrainzDisc(cuesheet)
+        return self.releases_by_disc(disc)
 
-    def releases_by_discid(self, discid, toc=None):
-        """Lookup releases by MusicBrainz disc ID or TOC string."""
-        if not discid and not toc:
+    def releases_by_disc(self, disc):
+        """Lookup releases by MusicBrainzDisc."""
+        discid = disc.discid
+        if discid is None:
+            discid = '-'
+        toc = disc.toc
+        if discid == '-' and toc is None:
             return []
 
-        result = []
-        if not discid:
-            discid = '-'
-        if not toc:
-            toc = None
+        releases = []
         try:
             response = mb_client.get_releases_by_discid(
                 discid,
                 toc=toc,
-                includes=['artists'],
+                includes=['artist-credits'],
                 cdstubs=False
             )
-            result = self._parse_releases(response)
+            if 'disc' in response:
+                releases = response['disc']['release-list']
+            elif 'release-list' in response:
+                releases = response['release-list']
         except mb_client.ResponseError as e:
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
                 pass # no matches
             else:
                 raise e
+        result = [_parse_release(r) for r in releases]
         return sorted(result, key=_release_key)
 
-    # TODO This doesn't work for multi-session CDs
-    # https://musicbrainz.org/doc/Disc_ID_Calculation
-    @staticmethod
-    def _create_discid(cuesheet):
-        """Create a MusicBrainz disc ID from a CueSheet."""
-        if not cuesheet.is_cd:
-            return None
 
-        first_track = cuesheet.tracks[0].number
-        last_track = cuesheet.tracks[-2].number # ignore lead-out
-        lead_in_blocks = cuesheet.lead_in // 588
-        offsets = defaultdict(int)
+# TODO This class doesn't support multi-session CDs
+class MusicBrainzDisc(object):
+    """Provide disc information suitable for MusicBrainz lookups.
+
+    See also:
+    - https://musicbrainz.org/doc/Disc_ID_Calculation
+    - https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2#discid
+    """
+    def __init__(self, cuesheet):
+        """Create a MusicBrainzDisc from a CueSheet."""
+        self._is_cd = cuesheet.is_cd
+        self._lead_in = cuesheet.lead_in // 588
+        self._tracks = []
         for track in cuesheet.tracks:
             number = track.number
-            offset = track.offset // 588 + lead_in_blocks
-            if track.number != 170:
-                offsets[number] = offset
+            offset = track.offset // 588 + self._lead_in
+            if number < 100:
+                self._tracks.append((number, offset))
             else:
-                offsets[0] = offset # lead-out gets index 0
+                self._tracks.insert(0, (0, offset)) # lead-out gets index 0
+        self.discid = self._create_discid()
+        self.toc = self._create_toc()
 
+    @property
+    def track_count(self):
+        return len(self._tracks) - 1 # ignore lead-out
+
+    def _create_discid(self):
+        """Return a disc ID for this disc, or None."""
+        if not self._is_cd:
+            return None
+
+        offsets = defaultdict(int)
+        for number, offset in self._tracks:
+            offsets[number] = offset
+
+        first_track = self._tracks[1][0]
+        last_track = self._tracks[-1][0]
         sha1 = hashlib.sha1()
         sha1.update(b'%02X' % first_track)
         sha1.update(b'%02X' % last_track)
@@ -90,42 +112,26 @@ class MusicBrainz(object):
         discid = discid.replace('=', '-')
         return discid
 
-    # TODO This doesn't work for multi-session CDs
-    # https://musicbrainz.org/doc/Disc_ID_Calculation
-    @staticmethod
-    def _create_toc(cuesheet):
-        """Create a MusicBrainz TOC string from a CueSheet."""
-        if not cuesheet.is_cd:
+    def _create_toc(self):
+        """Return a TOC string for this disc, or None."""
+        if not self._is_cd:
             return None
 
-        first_track = cuesheet.tracks[0].number
-        track_count = len(cuesheet.tracks) - 1 # ignore lead-out
-        lead_in_blocks = cuesheet.lead_in // 588
-        offsets = []
-        for track in cuesheet.tracks:
-            number = track.number
-            offset = track.offset // 588 + lead_in_blocks
-            if track.number != 170:
-                offsets.append(str(offset))
-            else:
-                offsets.insert(0, str(offset)) # lead-out gets index 0
+        first_track = self._tracks[1][0]
+        offsets = [str(t[1]) for t in self._tracks]
+        return '%s %s %s' % (
+            first_track,
+            self.track_count,
+            ' '.join(offsets)
+        )
 
-        return '%s %s %s' % (first_track, track_count, ' '.join(offsets))
 
-    @staticmethod
-    def _parse_releases(response):
-        """Parse MusicBrainz releases from the response."""
-        def release(dict_):
-            if 'artist-credit-phrase' in dict_:
-                dict_['artist'] = dict_['artist-credit-phrase']
-            return {k: dict_[k] for k in dict_ if k in RELEASES_KEYS}
-
-        releases = []
-        if 'disc' in response:
-            releases = response['disc']['release-list']
-        elif 'release-list' in response:
-            releases = response['release-list']
-        return [release(r) for r in releases]
+def _parse_release(release):
+    """Parse a MusicBrainz release."""
+    if 'artist-credit-phrase' in release:
+        release['artist'] = release['artist-credit-phrase']
+    result = {k: release[k] for k in release if k in RELEASES_KEYS}
+    return result
 
 
 def _release_key(release):

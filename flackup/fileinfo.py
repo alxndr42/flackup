@@ -56,7 +56,7 @@ class CueSheet(object):
     def audio_track_numbers(self):
         """Return a list of audio track numbers, excluding lead-out."""
         def is_audio(track):
-            return track.type == 0 and track.number != 170
+            return track.type == 0 and track.number < 100
 
         return [t.number for t in self.tracks if is_audio(t)]
 
