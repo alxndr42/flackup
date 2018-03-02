@@ -53,7 +53,7 @@ class MusicBrainz(object):
                 cdstubs=False
             )
             result = self._parse_releases(response)
-        except Exception as e:
+        except mb_client.ResponseError as e:
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
                 pass # no matches
             else:
