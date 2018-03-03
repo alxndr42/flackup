@@ -59,6 +59,27 @@ class TestMusicBrainz(object):
             '075992732628'
         )
 
+    def test_mbid_lookup(self):
+        """Test a lookup by release ID."""
+        mb = MusicBrainz()
+        release = mb.release_by_id('68d6add0-b185-38ad-9814-39ed5e4e231a')
+        self.assert_release(
+            [release],
+            '68d6add0-b185-38ad-9814-39ed5e4e231a',
+            'David Bowie',
+            '“Heroes”',
+            '1999-09-17',
+            '724352190805'
+        )
+        media = release.get('media', [])
+        assert len(media) == 1
+        tracks = media[0].get('tracks', [])
+        assert len(tracks) == 10
+        number = tracks[2].get('number')
+        assert number == '3'
+        title = tracks[2].get('title')
+        assert title == '“Heroes”'
+
     @staticmethod
     def assert_release(
             releases,

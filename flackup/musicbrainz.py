@@ -22,16 +22,23 @@ RELEASE_KEYS = [
     'title',
 ]
 
-
 """Properties to return for a medium.
 
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L460
 """
-MEDIUM_KEYS = [
-    'format',
-    'position',
-    'title',
-]
+MEDIUM_KEYS = ['format', 'position', 'title']
+
+"""Properties to return for a track.
+
+See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L691
+"""
+TRACK_KEYS = ['artist', 'number']
+
+"""Properties to return for a recording (merged into track properties).
+
+See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L498
+"""
+RECORDING_KEYS = ['title']
 
 
 class MusicBrainz(object):
@@ -41,12 +48,18 @@ class MusicBrainz(object):
         mb_client.set_useragent('flackup', VERSION)
 
     def releases_by_cuesheet(self, cuesheet):
-        """Lookup releases by CueSheet."""
+        """Lookup releases by CueSheet.
+
+        Does not include track information.
+        """
         disc = MusicBrainzDisc(cuesheet)
         return self.releases_by_disc(disc)
 
     def releases_by_disc(self, disc):
-        """Lookup releases by MusicBrainzDisc."""
+        """Lookup releases by MusicBrainzDisc.
+
+        Does not include track information.
+        """
         discid = disc.discid
         if discid is None:
             discid = '-'
@@ -73,6 +86,30 @@ class MusicBrainz(object):
                 raise e
         result = [_parse_release(r, disc) for r in releases]
         return sorted(result, key=_release_key)
+
+
+    def release_by_id(self, mbid, medium_position=None):
+        """Return a release by MusicBrainz ID, or None.
+
+        If medium_position is present, return only the medium at this position.
+        Includes track information.
+        """
+        release = None
+        try:
+            response = mb_client.get_release_by_id(
+                mbid,
+                includes=['artist-credits', 'recordings']
+            )
+            release = response['release']
+        except mb_client.ResponseError as e:
+            if isinstance(e.cause, HTTPError) and e.cause.code == 404:
+                pass # no matches
+            else:
+                raise e
+        if release is not None:
+            return _parse_release(release, medium_position=medium_position)
+        else:
+            return None
 
 
 # TODO This class doesn't support multi-session CDs
@@ -146,24 +183,43 @@ class MusicBrainzDisc(object):
         )
 
 
-def _parse_release(release, disc=None):
+def _parse_release(release, disc=None, medium_position=None):
     """Parse a MusicBrainz release.
 
-    If disc is present, return only the medium with a disc ID or TOC match,
-    all media otherwise.
+    If disc is present, return only the medium with a disc ID or TOC match.
+    If medium_position is present, return only the medium at this position.
     """
     result = _copy_dict(release, RELEASE_KEYS)
-    disc_medium = _find_medium(release, disc)
-    if disc_medium is not None:
-        result['media'] = [_parse_medium(disc_medium)]
+    medium = None
+    if disc is not None:
+        medium = _find_medium_by_disc(release, disc)
+    elif medium_position is not None:
+        medium = _find_medium_by_position(release, medium_position)
+    if medium is not None:
+        result['media'] = [_parse_medium(medium)]
     else:
         result['media'] = [_parse_medium(m) for m in release['medium-list']]
+    # Remove redundant track artists
+    release_artist = result['artist']
+    for m in result['media']:
+        for t in m['tracks']:
+            if t.get('artist') == release_artist:
+                del t['artist']
     return result
 
 
 def _parse_medium(medium):
     """Parse a MusicBrainz medium."""
     result = _copy_dict(medium, MEDIUM_KEYS)
+    tracks = medium['track-list']
+    result['tracks'] = [_parse_track(t) for t in tracks]
+    return result
+
+
+def _parse_track(track):
+    result = _copy_dict(track, TRACK_KEYS)
+    recording = track.get('recording', {})
+    result.update(_copy_dict(recording, RECORDING_KEYS))
     return result
 
 
@@ -185,11 +241,8 @@ def _release_key(release):
     return tuple(key)
 
 
-def _find_medium(release, disc):
+def _find_medium_by_disc(release, disc):
     """Return the best matching medium, or None."""
-    if disc is None:
-        return None
-
     media = release['medium-list']
 
     # Look for a disc ID match
@@ -212,6 +265,15 @@ def _find_medium(release, disc):
         return media[0]
     else:
         return None
+
+
+def _find_medium_by_position(release, position):
+    """Return the medium at position, or None."""
+    media = release['medium-list']
+    for m in media:
+        if m['position'] == position:
+            return m
+    return None
 
 
 def _copy_dict(dict_, keys):
