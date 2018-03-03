@@ -79,6 +79,10 @@ class TestMusicBrainz(object):
         assert release.get('medium-count') == 1
         assert release.get('status') == 'Official'
         assert release.get('title') == title
+        media = release.get('media')
+        assert media is not None
+        assert len(media) == 1
+        assert media[0]['format'] == 'CD'
 
 
 class FakeDisc(object):
@@ -87,6 +91,9 @@ class FakeDisc(object):
         self.discid = discid
         self.toc = toc
         self.track_count = track_count
+
+    def offset_distance(self, offsets):
+        return 0
 
 
 class FakeCueSheet(object):
