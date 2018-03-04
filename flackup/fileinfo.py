@@ -53,12 +53,9 @@ class CueSheet(object):
         return self._mcs.lead_in_samples
 
     @property
-    def audio_track_numbers(self):
-        """Return a list of audio track numbers, excluding lead-out."""
-        def is_audio(track):
-            return track.type == 0 and track.number < 100
-
-        return [t.number for t in self.tracks if is_audio(t)]
+    def audio_tracks(self):
+        """Return a list of audio tracks, excluding lead-out."""
+        return [t for t in self.tracks if t.type == 0 and t.number < 100]
 
 
 class Tags(object):

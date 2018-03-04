@@ -33,7 +33,8 @@ def main():
             flag_parse_ok = 'O'
             if file.cuesheet is not None:
                 flag_cuesheet = 'C'
-                for number in file.cuesheet.audio_track_numbers:
+                track_numbers = [t.number for t in file.cuesheet.audio_tracks]
+                for number in track_numbers:
                     if file.tags.track_tags(number):
                         flag_track_tags = 'T'
                         break

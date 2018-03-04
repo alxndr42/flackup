@@ -78,11 +78,10 @@ class TestCueSheet(object):
         assert cuesheet is not None
         assert cuesheet.is_cd
         assert cuesheet.lead_in == 88200
-        tracks = cuesheet.tracks
-        assert tracks is not None
-        track_numbers = [t.number for t in tracks]
+        track_numbers = [t.number for t in cuesheet.tracks]
         assert track_numbers == [1, 2, 3, 170]
-        assert cuesheet.audio_track_numbers == [1, 2, 3]
+        audio_track_numbers = [t.number for t in cuesheet.audio_tracks]
+        assert audio_track_numbers == [1, 2, 3]
 
 
 class TestTags(object):
@@ -93,7 +92,8 @@ class TestTags(object):
         file = FileInfo(datadir / 'test.flac')
         tags = file.tags
         assert not tags.album_tags()
-        for number in file.cuesheet.audio_track_numbers:
+        track_numbers = [t.number for t in file.cuesheet.audio_tracks]
+        for number in track_numbers:
             assert not tags.track_tags(number)
 
     def test_tagged(self, datadir):
