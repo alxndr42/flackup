@@ -19,6 +19,14 @@ _VERSION_NUMBER = 1
 _VERSION_TAG = 'FLACKUP_VERSION'
 
 
+"""A subset of FLAC stream information data.
+
+See also: https://xiph.org/flac/format.html#metadata_block_streaminfo
+"""
+StreamInfo = namedtuple(
+    'StreamInfo', 'channels sample_bits sample_rate sample_count')
+
+
 """A subset of FLAC cue sheet track data.
 
 See also: https://xiph.org/flac/format.html#cuesheet_track
@@ -154,6 +162,13 @@ class FileInfo(object):
         """Read the FLAC file and update the variables."""
         try:
             self._flac = FLAC(self.filename)
+            info = self._flac.info
+            self.streaminfo = StreamInfo(
+                info.channels,
+                info.bits_per_sample,
+                info.sample_rate,
+                info.total_samples
+            )
             if self._flac.cuesheet is not None:
                 self.cuesheet = CueSheet(self._flac.cuesheet)
             else:
@@ -164,6 +179,7 @@ class FileInfo(object):
         except Exception as e:
             self.parse_ok = False
             self.parse_exception = e
+            self.streaminfo = None
             self.cuesheet = None
             self.tags = None
 

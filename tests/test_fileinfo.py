@@ -9,15 +9,22 @@ class TestFileInfo(object):
         file = FileInfo(datadir / 'test.flac')
         assert file.parse_ok == True
         assert file.parse_exception is None
+        assert file.streaminfo is not None
         assert file.cuesheet is not None
         assert file.tags is not None
         assert file.pictures() is not None
+        streaminfo = file.streaminfo
+        assert streaminfo.channels == 2
+        assert streaminfo.sample_bits == 16
+        assert streaminfo.sample_rate == 44100
+        assert streaminfo.sample_count == 132300
 
     def test_init_empty(self, datadir):
         """Call the constructor with an empty FLAC file."""
         file = FileInfo(datadir / 'empty.flac')
         assert file.parse_ok == True
         assert file.parse_exception is None
+        assert file.streaminfo is not None
         assert file.cuesheet is None
         assert file.tags is not None
         assert file.pictures() is not None
@@ -27,6 +34,7 @@ class TestFileInfo(object):
         file = FileInfo(datadir / 'invalid.flac')
         assert file.parse_ok == False
         assert file.parse_exception is not None
+        assert file.streaminfo is None
         assert file.cuesheet is None
         assert file.tags is None
         assert file.pictures() is None
