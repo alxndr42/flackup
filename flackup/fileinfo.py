@@ -213,11 +213,8 @@ class FileInfo(object):
         old = self.get_picture(type_)
         new = Picture(type_, mime, width, height, depth, data)
         if old != new:
-            pictures = [p for p in self._flac.pictures if p.type != type_]
-            pictures.append(self._picture_f2m(new))
-            self._flac.clear_pictures()
-            for picture in pictures:
-                self._flac.add_picture(picture)
+            self.remove_picture(type_)
+            self._flac.add_picture(self._picture_f2m(new))
             changed = True
         return changed
 
@@ -227,11 +224,11 @@ class FileInfo(object):
         Returns True if anything changed.
         """
         changed = False
-        matches = [p for p in self._flac.pictures if p.type == type_]
-        if matches:
-            pictures = [p for p in self._flac.pictures if p.type != type_]
+        pics = self._flac.pictures
+        keep = [p for p in pics if p.type != type_]
+        if len(pics) != len(keep):
             self._flac.clear_pictures()
-            for picture in pictures:
+            for picture in keep:
                 self._flac.add_picture(picture)
             changed = True
         return changed
