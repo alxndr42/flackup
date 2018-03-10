@@ -63,6 +63,7 @@ class TestMusicBrainz(object):
         """Test a lookup by release ID."""
         mb = MusicBrainz()
         release = mb.release_by_id('68d6add0-b185-38ad-9814-39ed5e4e231a')
+        assert release is not None
         self.assert_release(
             [release],
             '68d6add0-b185-38ad-9814-39ed5e4e231a',
@@ -71,13 +72,13 @@ class TestMusicBrainz(object):
             '1999-09-17',
             '724352190805'
         )
-        media = release.get('media', [])
+        media = release['media']
         assert len(media) == 1
-        tracks = media[0].get('tracks', [])
+        tracks = media[0]['tracks']
         assert len(tracks) == 10
-        number = tracks[2].get('number')
+        number = tracks[2]['number']
         assert number == '3'
-        title = tracks[2].get('title')
+        title = tracks[2]['title']
         assert title == '“Heroes”'
 
     @staticmethod
@@ -87,21 +88,21 @@ class TestMusicBrainz(object):
             artist,
             title,
             date=None,
-            barcode=None):
+            barcode=None,
+            status='Official'):
         release = None
         for r in releases:
             if r['id'] == id_:
                 release = r
                 break
         assert release is not None
-        assert release.get('artist') == artist
+        assert release['artist'] == artist
         assert release.get('barcode') == barcode
         assert release.get('date') == date
-        assert release.get('medium-count') == 1
-        assert release.get('status') == 'Official'
-        assert release.get('title') == title
-        media = release.get('media')
-        assert media is not None
+        assert release['medium-count'] == 1
+        assert release.get('status') == status
+        assert release['title'] == title
+        media = release['media']
         assert len(media) == 1
         assert media[0]['format'] == 'CD'
 

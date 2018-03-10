@@ -217,8 +217,9 @@ def _parse_medium(medium):
 
 
 def _parse_track(track):
+    """Parse a MusicBrain track (including recording keys)."""
     result = _copy_dict(track, TRACK_KEYS)
-    recording = track.get('recording', {})
+    recording = track['recording']
     result.update(_copy_dict(recording, RECORDING_KEYS))
     return result
 
@@ -235,7 +236,7 @@ def _release_key(release):
         key.append(2)
     else:
         key.append(1)
-    key.append(release.get('medium-count', 99))
+    key.append(release['medium-count'])
     key.append(release.get('date', '9999'))
     key.append(release.get('barcode', '9999999999999'))
     return tuple(key)
@@ -248,7 +249,7 @@ def _find_medium_by_disc(release, disc):
     # Look for a disc ID match
     for m in media:
         for d in m['disc-list']:
-            if d.get('id', 'unknown') == disc.discid:
+            if d['id'] == disc.discid:
                 return m
 
     # Look for the closest TOC match
