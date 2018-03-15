@@ -9,6 +9,7 @@ verify_ssl = true
 
 musicbrainzngs = "*"
 mutagen = "*"
+pycodestyle = "*"
 pytest = "*"
 pytest-datadir = "*"
 pytest-runner = "*"
