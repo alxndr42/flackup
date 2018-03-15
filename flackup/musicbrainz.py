@@ -13,7 +13,7 @@ from flackup import VERSION
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L406
 """
 RELEASE_KEYS = [
-    'artist', # copy of artist-credit-phrase
+    'artist',  # copy of artist-credit-phrase
     'barcode',
     'date',
     'id',
@@ -81,12 +81,11 @@ class MusicBrainz(object):
                 releases = response['release-list']
         except mb_client.ResponseError as e:
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
-                pass # no matches
+                pass  # no matches
             else:
                 raise e
         result = [_parse_release(r, disc) for r in releases]
         return sorted(result, key=_release_key)
-
 
     def release_by_id(self, mbid, medium_position=None):
         """Return a release by MusicBrainz ID, or None.
@@ -103,7 +102,7 @@ class MusicBrainz(object):
             release = response['release']
         except mb_client.ResponseError as e:
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
-                pass # no matches
+                pass  # no matches
             else:
                 raise e
         if release is not None:
@@ -131,13 +130,13 @@ class MusicBrainzDisc(object):
             if number < 100:
                 self._tracks.append((number, offset))
             else:
-                self._tracks.insert(0, (0, offset)) # lead-out gets index 0
+                self._tracks.insert(0, (0, offset))  # lead-out gets index 0
         self.discid = self._create_discid()
         self.toc = self._create_toc()
 
     @property
     def track_count(self):
-        return len(self._tracks) - 1 # ignore lead-out
+        return len(self._tracks) - 1  # ignore lead-out
 
     def offset_distance(self, offsets):
         """Return a "distance" between the lists of track offsets.
@@ -254,6 +253,7 @@ def _find_medium_by_disc(release, disc):
 
     # Look for the closest TOC match
     media = [m for m in media if m['track-count'] == disc.track_count]
+
     def medium_key(medium):
         discs = medium['disc-list']
         dists = [disc.offset_distance(d['offset-list']) for d in discs]

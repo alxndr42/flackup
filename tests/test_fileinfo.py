@@ -7,7 +7,7 @@ class TestFileInfo(object):
     def test_init(self, datadir):
         """Call the constructor with a valid FLAC file."""
         file = FileInfo(datadir / 'test.flac')
-        assert file.parse_ok == True
+        assert file.parse_ok is True
         assert file.parse_exception is None
         assert file.streaminfo is not None
         assert file.cuesheet is not None
@@ -22,7 +22,7 @@ class TestFileInfo(object):
     def test_init_empty(self, datadir):
         """Call the constructor with an empty FLAC file."""
         file = FileInfo(datadir / 'empty.flac')
-        assert file.parse_ok == True
+        assert file.parse_ok is True
         assert file.parse_exception is None
         assert file.streaminfo is not None
         assert file.cuesheet is None
@@ -32,7 +32,7 @@ class TestFileInfo(object):
     def test_init_invalid(self, datadir):
         """Call the constructor with an invalid FLAC file."""
         file = FileInfo(datadir / 'invalid.flac')
-        assert file.parse_ok == False
+        assert file.parse_ok is False
         assert file.parse_exception is not None
         assert file.streaminfo is None
         assert file.cuesheet is None
@@ -51,16 +51,16 @@ class TestFileInfo(object):
         file = FileInfo(datadir / 'empty.flac')
         with open(str(datadir / 'cover.png'), 'rb') as cover:
             data = cover.read()
-        assert file.set_picture(3, 'image/png', 128, 128, 24, data)
-        assert not file.set_picture(3, 'image/png', 128, 128, 24, data)
+        assert file.set_picture(3, 'image/png', 128, 128, 24, data) is True
+        assert file.set_picture(3, 'image/png', 128, 128, 24, data) is False
         file.update()
         self.assert_picture(file, 3, 'image/png', 128, 128, 24, data)
 
     def test_remove_picture(self, datadir):
         """Test removing a picture."""
         file = FileInfo(datadir / 'tagged.flac')
-        assert file.remove_picture(3)
-        assert not file.remove_picture(3)
+        assert file.remove_picture(3) is True
+        assert file.remove_picture(3) is False
         file.update()
         assert file.get_picture(3) is None
 
@@ -84,7 +84,7 @@ class TestCueSheet(object):
         file = FileInfo(datadir / 'test.flac')
         cuesheet = file.cuesheet
         assert cuesheet is not None
-        assert cuesheet.is_cd
+        assert cuesheet.is_cd is True
         assert cuesheet.lead_in == 88200
         track_numbers = [t.number for t in cuesheet.tracks]
         assert track_numbers == [1, 2, 3, 170]
@@ -99,10 +99,10 @@ class TestTags(object):
         """Test reading an untagged FLAC file."""
         file = FileInfo(datadir / 'test.flac')
         tags = file.tags
-        assert not tags.album_tags()
+        assert tags.album_tags() == {}
         track_numbers = [t.number for t in file.cuesheet.audio_tracks]
         for number in track_numbers:
-            assert not tags.track_tags(number)
+            assert tags.track_tags(number) == {}
 
     def test_tagged(self, datadir):
         """Test reading a tagged FLAC file."""
@@ -124,19 +124,19 @@ class TestTags(object):
         album = tags.album_tags()
         album['TITLE'] = 'Title'
         album['ARTIST'] = 'Artist'
-        assert tags.update_album(album)
+        assert tags.update_album(album) is True
 
         track = tags.track_tags(1)
         track['TITLE'] = 'Track One'
-        assert tags.update_track(1, track)
+        assert tags.update_track(1, track) is True
 
         track = tags.track_tags(2)
-        assert not tags.update_track(2, track)
+        assert tags.update_track(2, track) is False
 
         track = tags.track_tags(3)
         track['HIDE'] = 'yes'
         track['PERFORMER'] = 'Terrible'
-        assert tags.update_track(3, track)
+        assert tags.update_track(3, track) is True
 
         file.update()
         file = FileInfo(datadir / 'test.flac')
@@ -154,18 +154,18 @@ class TestTags(object):
         album = tags.album_tags()
         album['TITLE'] = 'Title'
         album['ARTIST'] = 'Artist'
-        assert tags.update_album(album)
+        assert tags.update_album(album) is True
 
         track = tags.track_tags(1)
         track['TITLE'] = 'Track One'
-        assert tags.update_track(1, track)
+        assert tags.update_track(1, track) is True
 
         track = tags.track_tags(2)
-        assert not tags.update_track(2, track)
+        assert tags.update_track(2, track) is False
 
         track = tags.track_tags(3)
         del track['TITLE']
-        assert tags.update_track(3, track)
+        assert tags.update_track(3, track) is True
 
         file.update()
         file = FileInfo(datadir / 'tagged.flac')
