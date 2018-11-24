@@ -4,13 +4,13 @@ from mutagen.flac import FLAC, Picture as MutagenPicture
 
 
 """Tag names for both albums and tracks."""
-_COMMON_TAGS = ['ARTIST', 'GENRE', 'HIDE', 'PERFORMER', 'TITLE']
+_COMMON_TAGS = ['ARTIST', 'GENRE', 'HIDE', 'PERFORMER']
 
 """Album-level tag names."""
-ALBUM_TAGS = _COMMON_TAGS + ['DATE', 'RELEASE_MBID']
+ALBUM_TAGS = _COMMON_TAGS + ['ALBUM', 'DATE', 'DISC', 'RELEASE_MBID']
 
 """Track-level tag names."""
-TRACK_TAGS = _COMMON_TAGS
+TRACK_TAGS = _COMMON_TAGS + ['TITLE']
 
 """Flackup tags version number."""
 _VERSION_NUMBER = 1
@@ -86,7 +86,7 @@ class Tags(object):
 
     def track_tags(self, number):
         """Return a dictionary of track-level tags."""
-        prefix = 'TRACK_{:02d}_'.format(number)
+        prefix = 'TRACK_{:02d}_'.format(int(number))
         return self._collect_tags(prefix, *TRACK_TAGS)
 
     def update_album(self, tags):
@@ -101,7 +101,7 @@ class Tags(object):
 
         Returns True if anything changed.
         """
-        prefix = 'TRACK_{:02d}_'.format(number)
+        prefix = 'TRACK_{:02d}_'.format(int(number))
         return self._update_tags(tags, prefix, *TRACK_TAGS)
 
     def _collect_tags(self, prefix, *args):

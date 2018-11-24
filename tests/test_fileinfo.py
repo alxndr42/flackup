@@ -122,7 +122,7 @@ class TestTags(object):
         tags = file.tags
 
         album = tags.album_tags()
-        album['TITLE'] = 'Title'
+        album['ALBUM'] = 'Album'
         album['ARTIST'] = 'Artist'
         assert tags.update_album(album) is True
 
@@ -141,7 +141,7 @@ class TestTags(object):
         file.update()
         file = FileInfo(datadir / 'test.flac')
         tags = file.tags
-        self.assert_album(tags.album_tags(), 'Title', 'Artist', None, None)
+        self.assert_album(tags.album_tags(), 'Album', 'Artist', None, None)
         self.assert_track(tags.track_tags(1), 'Track One', None, None)
         self.assert_track(tags.track_tags(2), None, None, None)
         self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
@@ -152,7 +152,7 @@ class TestTags(object):
         tags = file.tags
 
         album = tags.album_tags()
-        album['TITLE'] = 'Title'
+        album['ALBUM'] = 'Album'
         album['ARTIST'] = 'Artist'
         assert tags.update_album(album) is True
 
@@ -170,14 +170,14 @@ class TestTags(object):
         file.update()
         file = FileInfo(datadir / 'tagged.flac')
         tags = file.tags
-        self.assert_album(tags.album_tags(), 'Title', 'Artist', 'Test', '2018')
+        self.assert_album(tags.album_tags(), 'Album', 'Artist', 'Test', '2018')
         self.assert_track(tags.track_tags(1), 'Track One', None, None)
         self.assert_track(tags.track_tags(2), 'Track 2', None, None)
         self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
 
     @staticmethod
-    def assert_album(tags, title, artist, genre, date):
-        assert tags.get('TITLE') == title
+    def assert_album(tags, album, artist, genre, date):
+        assert tags.get('ALBUM') == album
         assert tags.get('ARTIST') == artist
         assert tags.get('GENRE') == genre
         assert tags.get('DATE') == date
