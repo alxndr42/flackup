@@ -81,6 +81,47 @@ class TestMusicBrainz(object):
         title = tracks[2]['title']
         assert title == '“Heroes”'
 
+    def test_mbid_cuesheet_lookup(self):
+        """Test a lookup by release ID and cuesheet."""
+        mb = MusicBrainz()
+        offsets = [
+            0,
+            5515440,
+            13365240,
+            20744640,
+            30230256,
+            39166680,
+            43464960,
+            54129516,
+            68778360,
+            78015840,
+            86018520,
+            95589396,
+            108109680,
+            111931680,
+            121875936,
+            134958936,
+        ]
+        release = mb.release_by_id(
+            'c51e17aa-653f-3a8b-88df-8e7148d83587', FakeCueSheet(offsets))
+        assert release is not None
+        self.assert_release(
+            [release],
+            'c51e17aa-653f-3a8b-88df-8e7148d83587',
+            'Belly',
+            'Star',
+            '1993',
+            '5014436300202'
+        )
+        media = release['media']
+        assert len(media) == 1
+        tracks = media[0]['tracks']
+        assert len(tracks) == 15
+        number = tracks[2]['number']
+        assert number == '3'
+        title = tracks[2]['title']
+        assert title == 'Dusted'
+
     @staticmethod
     def assert_release(
             releases,

@@ -87,17 +87,17 @@ class MusicBrainz(object):
         result = [_parse_release(r, disc) for r in releases]
         return sorted(result, key=_release_key)
 
-    def release_by_id(self, mbid, medium_position=None):
+    def release_by_id(self, mbid, cuesheet=None):
         """Return a release by MusicBrainz ID, or None.
 
-        If medium_position is present, return only the medium at this position.
-        Includes track information.
+        If cuesheet is present, return only the medium with a disc ID or TOC
+        match. Includes track information.
         """
         release = None
         try:
             response = mb_client.get_release_by_id(
                 mbid,
-                includes=['artist-credits', 'recordings']
+                includes=['artist-credits', 'discids', 'recordings']
             )
             release = response['release']
         except mb_client.ResponseError as e:
@@ -106,7 +106,11 @@ class MusicBrainz(object):
             else:
                 raise e
         if release is not None:
-            return _parse_release(release, medium_position=medium_position)
+            if cuesheet is not None:
+                disc = MusicBrainzDisc(cuesheet)
+            else:
+                disc = None
+            return _parse_release(release, disc)
         else:
             return None
 
@@ -179,18 +183,15 @@ class MusicBrainzDisc(object):
             first_track, self.track_count, ' '.join(offsets))
 
 
-def _parse_release(release, disc=None, medium_position=None):
+def _parse_release(release, disc=None):
     """Parse a MusicBrainz release.
 
     If disc is present, return only the medium with a disc ID or TOC match.
-    If medium_position is present, return only the medium at this position.
     """
     result = _copy_dict(release, RELEASE_KEYS)
     medium = None
     if disc is not None:
         medium = _find_medium_by_disc(release, disc)
-    elif medium_position is not None:
-        medium = _find_medium_by_position(release, medium_position)
     if medium is not None:
         result['media'] = [_parse_medium(medium)]
     else:
@@ -263,15 +264,6 @@ def _find_medium_by_disc(release, disc):
         return media[0]
     else:
         return None
-
-
-def _find_medium_by_position(release, position):
-    """Return the medium at position, or None."""
-    media = release['medium-list']
-    for m in media:
-        if m['position'] == position:
-            return m
-    return None
 
 
 def _copy_dict(dict_, keys):
