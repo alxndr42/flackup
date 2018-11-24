@@ -140,6 +140,60 @@ See also: https://xiph.org/flac/format.html#metadata_block_picture
 Picture = namedtuple('Picture', 'type mime width height depth data')
 
 
+class Summary():
+    """A summary for a FileInfo object.
+
+       Flags:
+       - parse_ok: The file parsed successfully.
+       - cuesheet: A cue sheet is present.
+       - album_tags: Album-level tags are present (any number).
+       - track_tags: Track-level tags are present (any number).
+       - pictures: Pictures are present (any number).
+
+       The string representation uses the following flags:
+        - O: The file parsed successfully.
+        - C: A cue sheet is present.
+        - A: Album-level tags are present (any number).
+        - T: Track-level tags are present (any number).
+        - P: Pictures are present (any number).
+    """
+
+    def __init__(self, fileinfo):
+        self.parse_ok = fileinfo.parse_ok
+        self.cuesheet = False
+        self.album_tags = False
+        self.track_tags = False
+        self.pictures = False
+        if self.parse_ok:
+            if fileinfo.cuesheet is not None:
+                self.cuesheet = True
+                cs = fileinfo.cuesheet
+                track_numbers = [t.number for t in cs.audio_tracks]
+                for number in track_numbers:
+                    if fileinfo.tags.track_tags(number):
+                        self.track_tags = True
+                        break
+            if fileinfo.tags.album_tags():
+                self.album_tags = True
+            if fileinfo.pictures():
+                self.pictures = True
+
+    def __repr__(self):
+        def flag_or_dash(status, flag):
+            if status:
+                return flag
+            else:
+                return '-'
+        status = (
+            self.parse_ok,
+            self.cuesheet,
+            self.album_tags,
+            self.track_tags,
+            self.pictures
+        )
+        return ''.join(map(flag_or_dash, status, 'OCATP'))
+
+
 class FileInfo(object):
     """Read and write FLAC metadata.
 
@@ -157,6 +211,11 @@ class FileInfo(object):
     def __init__(self, filename):
         self.filename = str(filename)
         self.parse()
+
+    @property
+    def summary(self):
+        """Return a Summary for this FileInfo."""
+        return Summary(self)
 
     def parse(self):
         """Read the FLAC file and update the variables."""

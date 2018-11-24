@@ -70,33 +70,5 @@ def analyze(flac):
     - P: Pictures are present (any number).
     """
     for path in flac:
-        flag_parse_ok = '-'
-        flag_cuesheet = '-'
-        flag_album_tags = '-'
-        flag_track_tags = '-'
-        flag_pictures = '-'
-
         info = FileInfo(path)
-        if info.parse_ok:
-            flag_parse_ok = 'O'
-            if info.cuesheet is not None:
-                flag_cuesheet = 'C'
-                track_numbers = [t.number for t in info.cuesheet.audio_tracks]
-                for number in track_numbers:
-                    if info.tags.track_tags(number):
-                        flag_track_tags = 'T'
-                        break
-            if info.tags.album_tags():
-                flag_album_tags = 'A'
-            if info.pictures():
-                flag_pictures = 'P'
-
-        result = '%s%s%s%s%s %s' % (
-            flag_parse_ok,
-            flag_cuesheet,
-            flag_album_tags,
-            flag_track_tags,
-            flag_pictures,
-            path
-        )
-        click.echo(result)
+        click.echo('%s %s' % (info.summary, path))

@@ -187,3 +187,47 @@ class TestTags(object):
         assert tags.get('TITLE') == title
         assert tags.get('HIDE') == hide
         assert tags.get('PERFORMER') == performer
+
+
+class TestSummary(object):
+    """Test the Summary class."""
+
+    def test_empty(self, datadir):
+        """Test with an empty FLAC file."""
+        file = FileInfo(datadir / 'empty.flac')
+        summary = file.summary
+        assert summary.parse_ok is True
+        assert summary.cuesheet is False
+        assert summary.album_tags is False
+        assert summary.track_tags is False
+        assert summary.pictures is False
+
+    def test_valid(self, datadir):
+        """Test with a valid FLAC file."""
+        file = FileInfo(datadir / 'test.flac')
+        summary = file.summary
+        assert summary.parse_ok is True
+        assert summary.cuesheet is True
+        assert summary.album_tags is False
+        assert summary.track_tags is False
+        assert summary.pictures is False
+
+    def test_invalid(self, datadir):
+        """Test with an invalid FLAC file."""
+        file = FileInfo(datadir / 'invalid.flac')
+        summary = file.summary
+        assert summary.parse_ok is False
+        assert summary.cuesheet is False
+        assert summary.album_tags is False
+        assert summary.track_tags is False
+        assert summary.pictures is False
+
+    def test_tagged(self, datadir):
+        """Test with a tagged FLAC file."""
+        file = FileInfo(datadir / 'invalid.flac')
+        summary = file.summary
+        assert summary.parse_ok is False
+        assert summary.cuesheet is False
+        assert summary.album_tags is False
+        assert summary.track_tags is False
+        assert summary.pictures is False
