@@ -159,10 +159,10 @@ class MusicBrainzDisc(object):
         first_track = self._tracks[1][0]
         last_track = self._tracks[-1][0]
         sha1 = hashlib.sha1()
-        sha1.update(b'%02X' % first_track)
-        sha1.update(b'%02X' % last_track)
+        sha1.update('{:02X}'.format(first_track).encode())
+        sha1.update('{:02X}'.format(last_track).encode())
         for i in range(100):
-            sha1.update(b'%08X' % offsets[i])
+            sha1.update('{:08X}'.format(offsets[i]).encode())
 
         discid = base64.b64encode(sha1.digest(), b'._').decode('UTF-8')
         discid = discid.replace('=', '-')
@@ -175,11 +175,8 @@ class MusicBrainzDisc(object):
 
         first_track = self._tracks[1][0]
         offsets = [str(t[1]) for t in self._tracks]
-        return '%s %s %s' % (
-            first_track,
-            self.track_count,
-            ' '.join(offsets)
-        )
+        return '{} {} {}'.format(
+            first_track, self.track_count, ' '.join(offsets))
 
 
 def _parse_release(release, disc=None, medium_position=None):

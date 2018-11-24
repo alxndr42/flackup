@@ -24,7 +24,7 @@ def lookup(flac):
         click.echo(path)
         info = FileInfo(path)
         if not info.parse_ok:
-            click.echo('- Parse error (%s)' % info.parse_exception)
+            click.echo('- Parse error ({})'.format(info.parse_exception))
             continue
         if info.cuesheet is None:
             click.echo('- No cuesheet')
@@ -34,7 +34,7 @@ def lookup(flac):
         try:
             matches = mb.releases_by_cuesheet(info.cuesheet)
         except Exception as e:
-            click.echo('- Lookup error (%s)' % e)
+            click.echo('- Lookup error ({})'.format(e))
             continue
 
         if not matches:
@@ -47,11 +47,11 @@ def lookup(flac):
             if status == 'Official':
                 parts.append(match['title'])
             else:
-                parts.append('%s (%s)' % (match['title'], status))
+                parts.append('{} ({})'.format(match['title'], status))
             barcode = match.get('barcode')
             if barcode:
                 parts.append(barcode)
-            click.echo('- %s' % ' | '.join(parts))
+            click.echo('- {}'.format(' | '.join(parts)))
 
 
 @flackup.command()
@@ -71,4 +71,4 @@ def analyze(flac):
     """
     for path in flac:
         info = FileInfo(path)
-        click.echo('%s %s' % (info.summary, path))
+        click.echo('{} {}'.format(info.summary, path))

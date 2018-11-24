@@ -86,7 +86,7 @@ class Tags(object):
 
     def track_tags(self, number):
         """Return a dictionary of track-level tags."""
-        prefix = 'TRACK_%02d_' % number
+        prefix = 'TRACK_{:02d}_'.format(number)
         return self._collect_tags(prefix, *TRACK_TAGS)
 
     def update_album(self, tags):
@@ -101,7 +101,7 @@ class Tags(object):
 
         Returns True if anything changed.
         """
-        prefix = 'TRACK_%02d_' % number
+        prefix = 'TRACK_{:02d}_'.format(number)
         return self._update_tags(tags, prefix, *TRACK_TAGS)
 
     def _collect_tags(self, prefix, *args):
