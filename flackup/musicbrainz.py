@@ -11,7 +11,7 @@ from flackup import VERSION
 """Properties to return for a release.
 
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L406
-"""
+"""  # noqa
 RELEASE_KEYS = [
     'artist',  # copy of artist-credit-phrase
     'barcode',
@@ -25,19 +25,19 @@ RELEASE_KEYS = [
 """Properties to return for a medium.
 
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L460
-"""
+"""  # noqa
 MEDIUM_KEYS = ['format', 'position', 'title']
 
 """Properties to return for a track.
 
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L691
-"""
+"""  # noqa
 TRACK_KEYS = ['artist', 'number']
 
 """Properties to return for a recording (merged into track properties).
 
 See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrainzngs/mbxml.py#L498
-"""
+"""  # noqa
 RECORDING_KEYS = ['title']
 
 

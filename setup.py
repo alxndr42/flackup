@@ -33,7 +33,7 @@ setup(
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='FLAC CD backup manager',  # Required
+    description='FLAC CD Backup Manager',  # Required
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -95,6 +95,7 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        'click>=7',
         'musicbrainzngs>=0.6',
         'mutagen>=1.40',
     ],  # Optional
@@ -133,10 +134,7 @@ setup(
     # `pip` to create the appropriate form of executable for the target
     # platform.
     entry_points={  # Optional
-        'console_scripts': [
-            'flackup=flackup.main:main',
-            'flackup-analyze=flackup.main_analyze:main',
-        ],
+        'console_scripts': ['flackup=flackup.cli:flackup'],
     },
 
     setup_requires=[

@@ -22,7 +22,7 @@ class TestMusicBrainz(object):
     def test_toc_lookup(self):
         """Test a lookup by TOC string."""
         mb = MusicBrainz()
-        toc = '1 12 178475 150 12289 27294 41177 56350 74389 87462 100844 114867 133013 148708 157085'
+        toc = '1 12 178475 150 12289 27294 41177 56350 74389 87462 100844 114867 133013 148708 157085'  # noqa
         releases = mb.releases_by_disc(FakeDisc(None, toc, 12))
         self.assert_release(
             releases,
