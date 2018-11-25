@@ -83,7 +83,7 @@ class MusicBrainz(object):
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
                 pass  # no matches
             else:
-                raise e
+                raise MusicBrainzError from e
         result = [_parse_release(r, disc) for r in releases]
         return sorted(result, key=_release_key)
 
@@ -104,7 +104,7 @@ class MusicBrainz(object):
             if isinstance(e.cause, HTTPError) and e.cause.code == 404:
                 pass  # no matches
             else:
-                raise e
+                raise MusicBrainzError from e
         if release is not None:
             if cuesheet is not None:
                 disc = MusicBrainzDisc(cuesheet)
@@ -181,6 +181,11 @@ class MusicBrainzDisc(object):
         offsets = [str(t[1]) for t in self._tracks]
         return '{} {} {}'.format(
             first_track, self.track_count, ' '.join(offsets))
+
+
+class MusicBrainzError(Exception):
+    """Exception for MusicBrainz error responses."""
+    pass
 
 
 def _parse_release(release, disc=None):

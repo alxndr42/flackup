@@ -1,5 +1,7 @@
+import pytest
+
 from flackup.fileinfo import CueSheetTrack
-from flackup.musicbrainz import MusicBrainz
+from flackup.musicbrainz import MusicBrainz, MusicBrainzError
 
 
 class TestMusicBrainz(object):
@@ -121,6 +123,12 @@ class TestMusicBrainz(object):
         assert number == '3'
         title = tracks[2]['title']
         assert title == 'Dusted'
+
+    def test_invalid_lookup(self):
+        """Test an invalid lookup by disc ID."""
+        mb = MusicBrainz()
+        with pytest.raises(MusicBrainzError):
+            mb.releases_by_disc(FakeDisc('invalid-id'))
 
     @staticmethod
     def assert_release(
