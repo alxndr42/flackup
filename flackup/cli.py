@@ -1,5 +1,8 @@
+import os.path
+
 import click
 
+import flackup.convert as fc
 from flackup.fileinfo import FileInfo
 from flackup.musicbrainz import MusicBrainz, MusicBrainzError
 
@@ -131,3 +134,43 @@ def update_track_tags(fileinfo, release):
         if fileinfo.tags.update_track(track_number, tags):
             changed = True
     return changed
+
+
+@flackup.command()
+@click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
+@click.option('-d', '--output-dir',
+              help='Output directory',
+              type=click.Path(exists=True, file_okay=False, writable=True),
+              default='.')
+def convert(flac, output_dir):
+    """Convert FLAC files."""
+    for path in flac:
+        info = FileInfo(path)
+        summary = info.summary
+        click.echo('========================================')
+        click.echo('{} {}'.format(summary, path))
+        if not summary.cuesheet or not summary.album_tags:
+            click.echo('- Unsuitable file')
+            continue
+        album_tags = info.tags.album_tags()
+        if album_tags.get('HIDE') == 'true':
+            click.echo('- Hidden album')
+            continue
+        if 'ARTIST' not in album_tags or 'ALBUM' not in album_tags:
+            click.echo('- Insufficient album tags')
+            continue
+        tracks = fc.prepare_tracks(info, output_dir, 'ogg')
+        if not tracks:
+            click.echo('- No tracks to convert')
+            continue
+        if any(map(lambda t: os.path.exists(t.path), tracks)):
+            click.echo('- Existing tracks found')
+            continue
+        try:
+            click.echo('----- Decoding tracks ------------------')
+            tempdir = fc.decode_tracks(info, path)
+            click.echo('----- Encoding tracks ------------------')
+            fc.encode_tracks(tracks, tempdir, 'ogg')
+        except fc.ConversionError as e:
+            click.echo('ERROR {}'.format(e))
+            click.get_current_context().exit(1)
