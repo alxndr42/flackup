@@ -1,5 +1,3 @@
-import sys
-
 import click
 
 from flackup.fileinfo import FileInfo
@@ -14,45 +12,6 @@ RELEASE_URL = 'https://musicbrainz.org/release/{}'
 def flackup():
     """FLAC CD Backup Manager"""
     pass
-
-
-@flackup.command()
-@click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
-def lookup(flac):
-    """Lookup FLAC cuesheets in MusicBrainz."""
-    mb = MusicBrainz()
-    for path in flac:
-        click.echo(path)
-        info = FileInfo(path)
-        if not info.parse_ok:
-            click.echo('- Parse error ({})'.format(info.parse_exception))
-            continue
-        if info.cuesheet is None:
-            click.echo('- No cuesheet')
-            continue
-
-        matches = None
-        try:
-            matches = mb.releases_by_cuesheet(info.cuesheet)
-        except Exception as e:
-            click.echo('- Lookup error ({})'.format(e))
-            continue
-
-        if not matches:
-            click.echo('- No matches')
-            continue
-
-        for match in matches:
-            parts = [match['id'], match['artist']]
-            status = match.get('status', 'Unknown')
-            if status == 'Official':
-                parts.append(match['title'])
-            else:
-                parts.append('{} ({})'.format(match['title'], status))
-            barcode = match.get('barcode')
-            if barcode:
-                parts.append(barcode)
-            click.echo('- {}'.format(' | '.join(parts)))
 
 
 @flackup.command()
