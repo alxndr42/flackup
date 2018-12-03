@@ -102,8 +102,9 @@ def prompt_releases(candidates):
         media = release['medium-count']
         if media > 1:
             parts.append('Media: {}'.format(media))
-        if 'barcode' in release:
-            parts.append(release['barcode'])
+        barcode = release.get('barcode')
+        if barcode:
+            parts.append(barcode)
         parts.append(RELEASE_URL.format(release['id']))
         click.echo('- {:2d}: {}'.format(index, ', '.join(parts)))
     return click.prompt('## = Pick, [S]kip or [Q]uit')
