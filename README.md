@@ -4,6 +4,12 @@ Flackup manages audio CD backups as single FLAC files with [embedded cue
 sheets][cuesheet]. Add metadata from [MusicBrainz][] and convert albums to
 individual [Ogg Vorbis][] tracks.
 
+## Requirements
+
+* FLAC files with embedded cue sheets
+* `flac`, `oggenc` and `vorbisgain`
+* Python 3
+
 ## Installation
 
 Using pip (or [pipsi][]):
