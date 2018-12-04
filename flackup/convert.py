@@ -19,15 +19,19 @@ class ConversionError(Exception):
 
 def prepare_tracks(fileinfo, base_dir, fmt):
     """Return a list of Tracks to be encoded."""
-    def escape(path):
-        return path.replace(':', '_')
+    def sub(filename):
+        """Substitute unsafe/forbidden characters in the filename."""
+        filename = filename.replace('/', '_')
+        filename = filename.replace('\\', '_')
+        filename = filename.replace(':', '_')
+        return filename
 
     tracks = []
     cuesheet = fileinfo.cuesheet
     album_tags = fileinfo.tags.album_tags()
     album_artist = album_tags['ARTIST']
     album_title = album_tags['ALBUM']
-    dst_base = os.path.join(base_dir, album_artist, album_title)
+    dst_base = os.path.join(base_dir, sub(album_artist), sub(album_title))
     for track in cuesheet.audio_tracks:
         track_tags = fileinfo.tags.track_tags(track.number)
         if track_tags.get('HIDE') == 'true':
@@ -38,7 +42,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         dst_name = '{:02d} {}.{}'.format(track.number, track_title, fmt)
         if 'DISC' in album_tags:
             dst_name = '{}-{}'.format(album_tags['DISC'], dst_name)
-        dst_path = escape(os.path.join(dst_base, dst_name))
+        dst_path = os.path.join(dst_base, sub(dst_name))
         tags = dict(album_tags)
         track_artist = track_tags.get('ARTIST')
         if track_artist is not None and track_artist != album_artist:
