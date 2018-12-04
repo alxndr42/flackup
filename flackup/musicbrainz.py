@@ -16,6 +16,7 @@ RELEASE_KEYS = [
     'artist',  # copy of artist-credit-phrase
     'barcode',
     'date',
+    'group-id',
     'id',
     'medium-count',
     'status',
@@ -72,7 +73,7 @@ class MusicBrainz(object):
             response = mb_client.get_releases_by_discid(
                 discid,
                 toc=toc,
-                includes=['artist-credits'],
+                includes=['artist-credits', 'release-groups'],
                 cdstubs=False
             )
             if 'disc' in response:
@@ -97,7 +98,12 @@ class MusicBrainz(object):
         try:
             response = mb_client.get_release_by_id(
                 mbid,
-                includes=['artist-credits', 'discids', 'recordings']
+                includes=[
+                    'artist-credits',
+                    'discids',
+                    'recordings',
+                    'release-groups',
+                ]
             )
             release = response['release']
         except mb_client.ResponseError as e:
@@ -113,6 +119,28 @@ class MusicBrainz(object):
             return _parse_release(release, disc)
         else:
             return None
+
+    def front_cover(self, release):
+        """Return the front cover, or None.
+
+        Tries the release first, then the release group. Returns the image's
+        bytes.
+        """
+        try:
+            return mb_client.get_image_front(release['id'])
+        except mb_client.ResponseError as e:
+            if isinstance(e.cause, HTTPError) and e.cause.code == 404:
+                pass  # no front cover
+            else:
+                raise MusicBrainzError from e
+        try:
+            return mb_client.get_release_group_image_front(release['group-id'])
+        except mb_client.ResponseError as e:
+            if isinstance(e.cause, HTTPError) and e.cause.code == 404:
+                pass  # no front cover
+            else:
+                raise MusicBrainzError from e
+        return None
 
 
 # TODO This class doesn't support multi-session CDs
@@ -194,6 +222,7 @@ def _parse_release(release, disc=None):
     If disc is present, return only the medium with a disc ID or TOC match.
     """
     result = _copy_dict(release, RELEASE_KEYS)
+    result['group-id'] = release['release-group']['id']
     medium = None
     if disc is not None:
         medium = _find_medium_by_disc(release, disc)

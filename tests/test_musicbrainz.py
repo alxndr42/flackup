@@ -104,12 +104,12 @@ class TestMusicBrainz(object):
             121875936,
             134958936,
         ]
-        release = mb.release_by_id(
-            'c51e17aa-653f-3a8b-88df-8e7148d83587', FakeCueSheet(offsets))
+        mbid = 'c51e17aa-653f-3a8b-88df-8e7148d83587'
+        release = mb.release_by_id(mbid, FakeCueSheet(offsets))
         assert release is not None
         self.assert_release(
             [release],
-            'c51e17aa-653f-3a8b-88df-8e7148d83587',
+            mbid,
             'Belly',
             'Star',
             '1993',
@@ -123,6 +123,8 @@ class TestMusicBrainz(object):
         assert number == '3'
         title = tracks[2]['title']
         assert title == 'Dusted'
+        front_cover = mb.front_cover(release)
+        assert front_cover is not None
 
     def test_invalid_lookup(self):
         """Test an invalid lookup by disc ID."""
