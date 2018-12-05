@@ -26,6 +26,10 @@ If there are multiple releases matching the cue sheet (and there probably will
 be), Flackup will show you some release details, including the barcode, and let
 you pick the correct one.
 
+To add cover images to a number of tagged FLAC files:
+
+    flackup cover *.flac
+
 To convert a number of tagged FLAC files to Ogg Vorbis in the */var/ogg*
 directory:
 

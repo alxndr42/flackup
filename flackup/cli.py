@@ -8,6 +8,7 @@ from flackup.musicbrainz import MusicBrainz, MusicBrainzError
 
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+FRONT_COVER_TYPE = 3
 RELEASE_URL = 'https://musicbrainz.org/release/{}'
 
 
@@ -19,7 +20,8 @@ def flackup():
 
 @flackup.command()
 @click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
-def analyze(flac):
+@click.option('-v', '--verbose', help='Show more information.', is_flag=True)
+def analyze(flac, verbose):
     """Analyze FLAC files.
 
     For each file, prints a list of flags followed by the filename.
@@ -34,7 +36,21 @@ def analyze(flac):
     """
     for path in flac:
         info = FileInfo(path)
-        click.echo('{} {}'.format(info.summary, path))
+        if not verbose:
+            click.echo('{} {}'.format(info.summary, path))
+        else:
+            if info.parse_ok:
+                front = info.get_picture(FRONT_COVER_TYPE)
+            else:
+                front = None
+            if front is not None:
+                width = front.width
+                height = front.height
+                type_ = fc.picture_ext(front).upper()
+                img = '({:4d} x {:4d} {})'.format(width, height, type_)
+            else:
+                img = '                 '
+            click.echo('{} {} {}'.format(info.summary, img, path))
 
 
 @flackup.command()
@@ -55,7 +71,7 @@ def tag(flac):
         try:
             release = find_release(mb, info)
         except MusicBrainzError:
-            click.echo('- Error while querying MusicBrainz.')
+            click.echo('- Error while querying MusicBrainz')
             continue
         if release is None:
             continue
@@ -135,6 +151,44 @@ def update_track_tags(fileinfo, release):
         if fileinfo.tags.update_track(track_number, tags):
             changed = True
     return changed
+
+
+@flackup.command()
+@click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
+def cover(flac):
+    """Add cover images to tagged FLAC files."""
+    mb = MusicBrainz()
+    for path in flac:
+        info = FileInfo(path)
+        if not info.parse_ok:
+            continue
+        album_tags = info.tags.album_tags()
+        mbid = album_tags.get('RELEASE_MBID')
+        if mbid is None:
+            continue
+        front = info.get_picture(FRONT_COVER_TYPE)
+        if front is not None:
+            continue
+        click.echo('{} {}'.format(info.summary, path))
+        try:
+            release = mb.release_by_id(mbid)
+            data = mb.front_cover(release)
+            if data is not None:
+                front = fc.parse_picture(data, FRONT_COVER_TYPE)
+                if info.set_picture(front):
+                    info.update()
+                width = front.width
+                height = front.height
+                type_ = fc.picture_ext(front).upper()
+                click.echo('- {} x {} {}'.format(width, height, type_))
+            else:
+                click.echo('- No image found')
+        except MusicBrainzError:
+            click.echo('- Error while querying MusicBrainz')
+            continue
+        except Exception as e:
+            click.echo('- Error while processing image ({})'.format(e))
+            continue
 
 
 @flackup.command()
