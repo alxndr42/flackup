@@ -1,9 +1,14 @@
 from collections import namedtuple
+import io
 import os
 import os.path
 import shutil
 import tempfile
 import wave
+
+from PIL import Image
+
+from flackup.fileinfo import Picture
 
 
 TRACK_WAV = 'track-{:02d}.wav'
@@ -154,6 +159,37 @@ def replaygain_ogg(tracks):
     exit = res >> 8
     if exit != 0:
         raise ConversionError('Non-zero exit status.')
+
+
+def parse_picture(bytes_, type_):
+    """Return a Picture created from the given bytes and type.
+
+    Throws an exception in case of errors or unsupported formats.
+    """
+    image = Image.open(io.BytesIO(bytes_))
+    if image.format == 'JPEG':
+        mime = 'image/jpeg'
+    elif image.format == 'PNG':
+        mime = 'image/png'
+    else:
+        raise Exception('Unsupported format: {}'.format(image.format))
+    if image.mode == 'RGB':
+        depth = 24
+    elif image.mode == 'RGBA':
+        depth = 32
+    else:
+        raise Exception('Unsupported mode: {}'.format(image.mode))
+    return Picture(type_, mime, image.width, image.height, depth, bytes_)
+
+
+def picture_ext(picture):
+    """Return a file extension for the Picture's MIME type."""
+    if picture.mime == 'image/jpeg':
+        return 'jpg'
+    elif picture.mime == 'image/png':
+        return 'png'
+    else:
+        return 'bin'
 
 
 def copy(wave_in, wave_out, sample_count, sample_bytes):

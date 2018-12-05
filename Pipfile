@@ -11,5 +11,6 @@ pytest = "*"
 pytest-datadir = "*"
 pytest-runner = "*"
 click = "*"
+pillow = "*"
 
 [dev-packages]

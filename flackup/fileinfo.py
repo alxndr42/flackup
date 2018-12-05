@@ -263,17 +263,16 @@ class FileInfo(object):
                 result = self._picture_m2f(matches[0])
         return result
 
-    def set_picture(self, type_, mime, width, height, depth, data):
-        """Set the picture of the given type.
+    def set_picture(self, picture):
+        """Set or replace the Picture of its type.
 
         Returns True if anything changed.
         """
         changed = False
-        old = self.get_picture(type_)
-        new = Picture(type_, mime, width, height, depth, data)
-        if old != new:
-            self.remove_picture(type_)
-            self._flac.add_picture(self._picture_f2m(new))
+        old = self.get_picture(picture.type)
+        if old != picture:
+            self.remove_picture(picture.type)
+            self._flac.add_picture(self._picture_f2m(picture))
             changed = True
         return changed
 

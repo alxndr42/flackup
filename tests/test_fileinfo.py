@@ -1,3 +1,4 @@
+from flackup.convert import parse_picture
 from flackup.fileinfo import FileInfo
 
 
@@ -51,8 +52,9 @@ class TestFileInfo(object):
         file = FileInfo(datadir / 'empty.flac')
         with open(str(datadir / 'cover.png'), 'rb') as cover:
             data = cover.read()
-        assert file.set_picture(3, 'image/png', 128, 128, 24, data) is True
-        assert file.set_picture(3, 'image/png', 128, 128, 24, data) is False
+        picture = parse_picture(data, 3)
+        assert file.set_picture(picture) is True
+        assert file.set_picture(picture) is False
         file.update()
         self.assert_picture(file, 3, 'image/png', 128, 128, 24, data)
 
