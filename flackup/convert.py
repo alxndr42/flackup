@@ -29,6 +29,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         filename = filename.replace('/', '_')
         filename = filename.replace('\\', '_')
         filename = filename.replace(':', '_')
+        filename = filename.replace('?', '_')
         return filename
 
     tracks = []
@@ -57,7 +58,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
     return tracks
 
 
-def decode_tracks(fileinfo, flac):
+def decode_tracks(fileinfo):
     """Decode the FLAC file into individual WAV files.
 
     WAV file names follow the pattern "track-NN.wav".
@@ -70,6 +71,7 @@ def decode_tracks(fileinfo, flac):
         raise ConversionError('flac executable not found.')
 
     tempdir = tempfile.TemporaryDirectory(prefix='flackup-')
+    flac = fileinfo.path
     wav = os.path.join(tempdir.name, 'flackup.wav')
     res = os.system('flac -d {} -o {}'.format(quote(flac), quote(wav)))
     exit = res >> 8
@@ -190,6 +192,21 @@ def picture_ext(picture):
         return 'png'
     else:
         return 'bin'
+
+
+def export_cover(picture, dst_base, max_width=500):
+    """Export the Picture as a size-constrained cover.ext file."""
+    cover_name = 'cover.{}'.format(picture_ext(picture))
+    cover_path = os.path.join(dst_base, cover_name)
+    image = Image.open(io.BytesIO(picture.data))
+    if picture.width > max_width:
+        factor = max_width / picture.width
+        height = int(picture.height * factor)
+        image = image.resize((max_width, height), Image.LANCZOS)
+        image.save(cover_path, quality=90)
+    else:
+        with open(cover_path, 'wb') as f:
+            f.write(picture.data)
 
 
 def copy(wave_in, wave_out, sample_count, sample_bytes):

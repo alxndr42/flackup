@@ -116,7 +116,7 @@ class TestTags(object):
         self.assert_album(album, 'Test Album', 'Test Artist', 'Test', '2018')
         self.assert_track(tags.track_tags(1), 'Track 1', None, None)
         self.assert_track(tags.track_tags(2), 'Track 2', None, None)
-        self.assert_track(tags.track_tags(3), 'Track 3', 'yes', 'Terrible')
+        self.assert_track(tags.track_tags(3), 'Track 3', 'true', 'Terrible')
 
     def test_update_untagged(self, datadir):
         """Test updating an untagged FLAC file."""
@@ -136,7 +136,7 @@ class TestTags(object):
         assert tags.update_track(2, track) is False
 
         track = tags.track_tags(3)
-        track['HIDE'] = 'yes'
+        track['HIDE'] = 'true'
         track['PERFORMER'] = 'Terrible'
         assert tags.update_track(3, track) is True
 
@@ -146,7 +146,7 @@ class TestTags(object):
         self.assert_album(tags.album_tags(), 'Album', 'Artist', None, None)
         self.assert_track(tags.track_tags(1), 'Track One', None, None)
         self.assert_track(tags.track_tags(2), None, None, None)
-        self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
+        self.assert_track(tags.track_tags(3), None, 'true', 'Terrible')
 
     def test_update_tagged(self, datadir):
         """Test updating a tagged FLAC file."""
@@ -175,7 +175,7 @@ class TestTags(object):
         self.assert_album(tags.album_tags(), 'Album', 'Artist', 'Test', '2018')
         self.assert_track(tags.track_tags(1), 'Track One', None, None)
         self.assert_track(tags.track_tags(2), 'Track 2', None, None)
-        self.assert_track(tags.track_tags(3), None, 'yes', 'Terrible')
+        self.assert_track(tags.track_tags(3), None, 'true', 'Terrible')
 
     @staticmethod
     def assert_album(tags, album, artist, genre, date):

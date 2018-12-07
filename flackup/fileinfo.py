@@ -198,7 +198,7 @@ class FileInfo(object):
     """Read and write FLAC metadata.
 
     Variables:
-    - filename: The FLAC file.
+    - path: The FLAC file.
     - parse_ok: True if the file was parsed successfully.
                 If False, cuesheet and tags will be None.
     - parse_exception: The exception raised during parsing, or None.
@@ -208,8 +208,8 @@ class FileInfo(object):
     This class supports only one picture per type.
     """
 
-    def __init__(self, filename):
-        self.filename = str(filename)
+    def __init__(self, path):
+        self.path = str(path)
         self.parse()
 
     @property
@@ -220,7 +220,7 @@ class FileInfo(object):
     def parse(self):
         """Read the FLAC file and update the variables."""
         try:
-            self._flac = FLAC(self.filename)
+            self._flac = FLAC(self.path)
             info = self._flac.info
             self.streaminfo = StreamInfo(
                 info.channels,

@@ -223,9 +223,13 @@ def convert(flac, output_dir):
             continue
         try:
             click.echo('----- Decoding tracks ------------------')
-            tempdir = fc.decode_tracks(info, path)
+            tempdir = fc.decode_tracks(info)
             click.echo('----- Encoding tracks ------------------')
             fc.encode_tracks(tracks, tempdir, 'ogg')
         except fc.ConversionError as e:
             click.echo('ERROR {}'.format(e))
             click.get_current_context().exit(1)
+        front = info.get_picture(FRONT_COVER_TYPE)
+        if front is not None:
+            dst_base = os.path.dirname(tracks[0].path)
+            fc.export_cover(front, dst_base)
