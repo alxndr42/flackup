@@ -61,13 +61,11 @@ def tag(flac):
     for path in flac:
         info = FileInfo(path)
         summary = info.summary
-        click.echo('{} {}'.format(summary, path))
         if not summary.parse_ok or not summary.cuesheet:
-            click.echo('- Unsuitable file')
             continue
-        # TODO Add picture tagging "and summary.pictures"
         if summary.album_tags and summary.track_tags:
             continue
+        click.echo('{} {}'.format(summary, path))
         try:
             release = find_release(mb, info)
         except MusicBrainzError:
@@ -202,25 +200,20 @@ def convert(flac, output_dir):
     for path in flac:
         info = FileInfo(path)
         summary = info.summary
-        click.echo('========================================')
-        click.echo('{} {}'.format(summary, path))
-        if not summary.cuesheet or not summary.album_tags:
-            click.echo('- Unsuitable file')
+        if not summary.parse_ok or not summary.cuesheet:
             continue
         album_tags = info.tags.album_tags()
         if album_tags.get('HIDE') == 'true':
-            click.echo('- Hidden album')
             continue
         if 'ARTIST' not in album_tags or 'ALBUM' not in album_tags:
-            click.echo('- Insufficient album tags')
             continue
         tracks = fc.prepare_tracks(info, output_dir, 'ogg')
         if not tracks:
-            click.echo('- No tracks to convert')
             continue
         if any(map(lambda t: os.path.exists(t.path), tracks)):
-            click.echo('- Existing tracks found')
             continue
+        click.echo('========================================')
+        click.echo('{} {}'.format(summary, path))
         try:
             click.echo('----- Decoding tracks ------------------')
             tempdir = fc.decode_tracks(info)
