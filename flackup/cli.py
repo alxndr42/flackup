@@ -90,17 +90,20 @@ def find_release(musicbrainz, fileinfo):
         if not releases:
             click.echo('- No releases found')
             return None
-        while True:
-            value = prompt_releases(releases)
-            if value.isdecimal():
-                pick = int(value)
-                if pick >= 0 and pick < len(releases):
-                    mbid = releases[pick]['id']
-                    break
-            elif value.lower() == 's':
-                return None
-            elif value.lower() == 'q':
-                click.get_current_context().exit()
+        if len(releases) > 1:
+            while True:
+                value = prompt_releases(releases)
+                if value.isdecimal():
+                    pick = int(value)
+                    if pick >= 0 and pick < len(releases):
+                        mbid = releases[pick]['id']
+                        break
+                elif value.lower() == 's':
+                    return None
+                elif value.lower() == 'q':
+                    click.get_current_context().exit()
+        else:
+            mbid = releases[0]['id']
     return musicbrainz.release_by_id(mbid, fileinfo.cuesheet)
 
 
