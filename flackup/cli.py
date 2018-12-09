@@ -39,18 +39,20 @@ def analyze(flac, verbose):
         if not verbose:
             click.echo('{} {}'.format(info.summary, path))
         else:
+            img = '|                 |'
+            url = ''
             if info.parse_ok:
                 front = info.get_picture(FRONT_COVER_TYPE)
-            else:
-                front = None
-            if front is not None:
-                width = front.width
-                height = front.height
-                type_ = fc.picture_ext(front).upper()
-                img = '({:4d} x {:4d} {})'.format(width, height, type_)
-            else:
-                img = '                 '
-            click.echo('{} {} {}'.format(info.summary, img, path))
+                if front is not None:
+                    width = front.width
+                    height = front.height
+                    type_ = fc.picture_ext(front).upper()
+                    img = '| {:4d} x {:4d} {} |'.format(width, height, type_)
+                album_tags = info.tags.album_tags()
+                mbid = album_tags.get('RELEASE_MBID')
+                if mbid is not None:
+                    url = ' | ' + RELEASE_URL.format(mbid)
+            click.echo('{} {} {}{}'.format(info.summary, img, path, url))
 
 
 @flackup.command()
