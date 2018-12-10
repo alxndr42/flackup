@@ -7,7 +7,13 @@ from mutagen.flac import FLAC, Picture as MutagenPicture
 _COMMON_TAGS = ['ARTIST', 'GENRE', 'HIDE', 'PERFORMER']
 
 """Album-level tag names."""
-ALBUM_TAGS = _COMMON_TAGS + ['ALBUM', 'DATE', 'DISC', 'RELEASE_MBID']
+ALBUM_TAGS = _COMMON_TAGS + [
+    'ALBUM',
+    'DATE',
+    'DATE_ORIGINAL',
+    'DISC',
+    'RELEASE_MBID',
+]
 
 """Track-level tag names."""
 TRACK_TAGS = _COMMON_TAGS + ['TITLE']

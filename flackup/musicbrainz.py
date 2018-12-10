@@ -120,6 +120,30 @@ class MusicBrainz(object):
         else:
             return None
 
+    def first_release_date(self, group_id):
+        """Return the first release date in the release group, or None."""
+        dates = []
+        limit = 25
+        offset = 0
+        while True:
+            try:
+                response = mb_client.browse_releases(
+                    release_group=group_id,
+                    limit=limit,
+                    offset=offset)
+                releases = response['release-list']
+                dates.extend([r['date'] for r in releases if 'date' in r])
+                if len(releases) < limit:
+                    break
+                else:
+                    offset += limit
+            except mb_client.ResponseError as e:
+                raise MusicBrainzError from e
+        if dates:
+            return min(dates)
+        else:
+            return None
+
     def front_cover(self, release):
         """Return the front cover, or None.
 

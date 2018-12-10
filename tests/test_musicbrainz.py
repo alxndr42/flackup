@@ -132,6 +132,12 @@ class TestMusicBrainz(object):
         with pytest.raises(MusicBrainzError):
             mb.releases_by_disc(FakeDisc('invalid-id'))
 
+    def test_first_release_date(self):
+        """Test the first_release_date method."""
+        mb = MusicBrainz()
+        date = mb.first_release_date('95950776-0eb8-3672-a503-e2181b1773be')
+        assert date == '1978'
+
     @staticmethod
     def assert_release(
             releases,

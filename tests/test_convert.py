@@ -20,6 +20,13 @@ class TestConvert(object):
             assert len(track.tags) == 5
             assert track.path.endswith('.ogg')
 
+    def test_prepare_tracks_date_original(self, datadir):
+        """Test the prepare_tracks function with a DATE_ORIGINAL tag."""
+        info = FileInfo(datadir / 'date_original.flac')
+        tracks = fc.prepare_tracks(info, str(datadir), 'ogg')
+        for track in tracks:
+            assert track.tags['DATE'] == '1970'
+
     def test_decode_tracks(self, datadir):
         """Test the prepare_tracks function."""
         info = FileInfo(datadir / 'tagged.flac')

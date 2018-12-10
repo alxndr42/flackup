@@ -70,12 +70,13 @@ def tag(flac):
         click.echo('{} {}'.format(summary, path))
         try:
             release = find_release(mb, info)
+            if release is None:
+                continue
+            original_date = mb.first_release_date(release['group-id'])
         except MusicBrainzError:
             click.echo('- Error while querying MusicBrainz')
             continue
-        if release is None:
-            continue
-        album_changed = update_album_tags(info, release)
+        album_changed = update_album_tags(info, release, original_date)
         track_changed = update_track_tags(info, release)
         if album_changed or track_changed:
             info.update()
@@ -129,17 +130,33 @@ def prompt_releases(candidates):
     return click.prompt('## = Pick, [S]kip or [Q]uit')
 
 
-def update_album_tags(fileinfo, release):
+def update_album_tags(fileinfo, release, original_date):
     """Return True if the album tags were changed."""
     tags = fileinfo.tags.album_tags()
     tags['RELEASE_MBID'] = release['id']
     tags['ALBUM'] = release['title']
     tags['ARTIST'] = release['artist']
-    if 'date' in release:
+    date = release.get('date')
+    if date is not None:
         tags['DATE'] = release['date']
+    if use_original_date(original_date, date):
+        tags['DATE_ORIGINAL'] = original_date
     if release['medium-count'] > 1:
         tags['DISC'] = release['media'][0]['position']
     return fileinfo.tags.update_album(tags)
+
+
+def use_original_date(original_date, release_date):
+    """Return True if the original date should be used in tags."""
+    if original_date is None:
+        return False
+    if release_date is None:
+        return True
+    original_year = original_date[:4]
+    release_year = release_date[:4]
+    if original_year == release_year:
+        return False
+    return True
 
 
 def update_track_tags(fileinfo, release):

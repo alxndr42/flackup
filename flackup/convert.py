@@ -35,6 +35,10 @@ def prepare_tracks(fileinfo, base_dir, fmt):
     tracks = []
     cuesheet = fileinfo.cuesheet
     album_tags = fileinfo.tags.album_tags()
+    if 'DATE_ORIGINAL' in album_tags:
+        album_tags['DATE'] = album_tags['DATE_ORIGINAL']
+    if 'DATE' in album_tags:
+        album_tags['DATE'] = album_tags['DATE'][:4]
     album_artist = album_tags['ARTIST']
     album_title = album_tags['ALBUM']
     dst_base = os.path.join(base_dir, sub(album_artist), sub(album_title))
