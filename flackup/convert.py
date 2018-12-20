@@ -183,6 +183,8 @@ def parse_picture(bytes_, type_):
         depth = 24
     elif image.mode == 'RGBA':
         depth = 32
+    elif image.mode == 'CMYK':
+        depth = 32
     else:
         raise Exception('Unsupported mode: {}'.format(image.mode))
     return Picture(type_, mime, image.width, image.height, depth, bytes_)
@@ -200,14 +202,15 @@ def picture_ext(picture):
 
 def export_cover(picture, dst_base, max_width=500):
     """Export the Picture as a size-constrained cover.ext file."""
-    cover_name = 'cover.{}'.format(picture_ext(picture))
-    cover_path = os.path.join(dst_base, cover_name)
+    cover_path = os.path.join(dst_base, 'cover.jpg')
     image = Image.open(io.BytesIO(picture.data))
     if picture.width > max_width:
         factor = max_width / picture.width
         height = int(picture.height * factor)
         image = image.resize((max_width, height), Image.LANCZOS)
-        image.save(cover_path, quality=90)
+        if image.mode != 'RGB':
+            image = image.convert(mode='RGB')
+        image.save(cover_path, quality=90, optimize=True)
     else:
         with open(cover_path, 'wb') as f:
             f.write(picture.data)

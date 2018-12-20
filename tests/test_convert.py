@@ -55,5 +55,5 @@ class TestConvert(object):
         info = FileInfo(datadir / 'tagged.flac')
         front = info.get_picture(3)
         fc.export_cover(front, str(datadir))
-        path = Path(datadir / 'cover.png')
+        path = Path(datadir / 'cover.jpg')
         assert path.is_file()
