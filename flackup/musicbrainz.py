@@ -292,8 +292,8 @@ def _release_key(release):
     else:
         key.append(1)
     key.append(release['medium-count'])
+    key.append(release.get('barcode', '9999999999999').lstrip('0'))
     key.append(release.get('date', '9999'))
-    key.append(release.get('barcode', '9999999999999'))
     return tuple(key)
 
 
