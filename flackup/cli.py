@@ -217,7 +217,10 @@ def cover(flac):
               help='Output directory',
               type=click.Path(exists=True, file_okay=False, writable=True),
               default='.')
-def convert(flac, output_dir):
+@click.option('--hidden',
+              help='Convert albums with a HIDE=true tag.',
+              is_flag=True)
+def convert(flac, output_dir, hidden):
     """Convert FLAC files."""
     for path in flac:
         info = FileInfo(path)
@@ -225,7 +228,7 @@ def convert(flac, output_dir):
         if not summary.parse_ok or not summary.cuesheet:
             continue
         album_tags = info.tags.album_tags()
-        if album_tags.get('HIDE') == 'true':
+        if album_tags.get('HIDE') == 'true' and not hidden:
             continue
         if 'ARTIST' not in album_tags or 'ALBUM' not in album_tags:
             continue
