@@ -39,7 +39,8 @@ You can get help for all commands with the `-h` parameter:
 
     flackup -h
 
-  [cuesheet]: https://xiph.org/flac/documentation_tools_flac.html#encoding_options
-  [MusicBrainz]: https://musicbrainz.org/
-  [Ogg Vorbis]: https://xiph.org/vorbis/
-  [pipsi]: https://github.com/mitsuhiko/pipsi
+
+[cuesheet]: https://xiph.org/flac/documentation_tools_flac.html#encoding_options
+[musicbrainz]: https://musicbrainz.org/
+[ogg vorbis]: https://xiph.org/vorbis/
+[pipsi]: https://github.com/mitsuhiko/pipsi
