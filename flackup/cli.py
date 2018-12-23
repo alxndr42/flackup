@@ -57,7 +57,8 @@ def analyze(flac, verbose):
 
 @flackup.command()
 @click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
-def tag(flac):
+@click.option('--mbid', help='Use this MBID for release metadata.')
+def tag(flac, mbid):
     """Tag FLAC files."""
     mb = MusicBrainz()
     for path in flac:
@@ -69,7 +70,10 @@ def tag(flac):
             continue
         click.echo('{} {}'.format(summary, path))
         try:
-            release = find_release(mb, info)
+            if mbid is None:
+                release = find_release(mb, info)
+            else:
+                release = mb.release_by_id(mbid, info.cuesheet)
             if release is None:
                 continue
             original_date = mb.first_release_date(release['group-id'])
