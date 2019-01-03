@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1
+* Additional filename escaping
+
 ## 0.6.0
 * Export front cover as JPEG
 * Add --hidden option for convert
