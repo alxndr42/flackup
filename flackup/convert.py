@@ -30,6 +30,8 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         filename = filename.replace('\\', '_')
         filename = filename.replace(':', '_')
         filename = filename.replace('?', '_')
+        filename = filename.replace('.', '_')
+        filename = filename.strip(' ')
         return filename
 
     tracks = []
@@ -49,10 +51,10 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         track_title = track_tags.get('TITLE')
         if track_title is None:
             track_title = 'Untitled'
-        dst_name = '{:02d} {}.{}'.format(track.number, track_title, fmt)
+        dst_name = '{:02d} {}.{}'.format(track.number, sub(track_title), fmt)
         if 'DISC' in album_tags:
             dst_name = '{}-{}'.format(album_tags['DISC'], dst_name)
-        dst_path = os.path.join(dst_base, sub(dst_name))
+        dst_path = os.path.join(dst_base, dst_name)
         tags = dict(album_tags)
         track_artist = track_tags.get('ARTIST')
         if track_artist is not None and track_artist != album_artist:
