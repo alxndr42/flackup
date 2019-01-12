@@ -15,6 +15,7 @@ See also: https://github.com/alastair/python-musicbrainzngs/blob/v0.6/musicbrain
 RELEASE_KEYS = [
     'artist',  # copy of artist-credit-phrase
     'barcode',
+    'country',
     'date',
     'group-id',
     'id',

@@ -129,6 +129,9 @@ def prompt_releases(candidates):
         barcode = release.get('barcode')
         if barcode:
             parts.append(barcode)
+        country = release.get('country')
+        if country:
+            parts.append(country)
         parts.append(RELEASE_URL.format(release['id']))
         click.echo('- {:2d}: {}'.format(index, ', '.join(parts)))
     return click.prompt('## = Pick, [S]kip or [Q]uit')
