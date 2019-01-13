@@ -21,7 +21,10 @@ def flackup():
 @flackup.command()
 @click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
 @click.option('-v', '--verbose', help='Show more information.', is_flag=True)
-def analyze(flac, verbose):
+@click.option('--hidden',
+              help='Show only albums with a HIDE=true tag.',
+              is_flag=True)
+def analyze(flac, verbose, hidden):
     """Analyze FLAC files.
 
     For each file, prints a list of flags followed by the filename.
@@ -36,6 +39,12 @@ def analyze(flac, verbose):
     """
     for path in flac:
         info = FileInfo(path)
+        if info.parse_ok:
+            album_tags = info.tags.album_tags()
+        else:
+            album_tags = {}
+        if album_tags.get('HIDE') != 'true' and hidden:
+            continue
         if not verbose:
             click.echo('{} {}'.format(info.summary, path))
         else:
@@ -48,7 +57,6 @@ def analyze(flac, verbose):
                     height = front.height
                     type_ = fc.picture_ext(front).upper()
                     img = '| {:4d} x {:4d} {} |'.format(width, height, type_)
-                album_tags = info.tags.album_tags()
                 mbid = album_tags.get('RELEASE_MBID')
                 if mbid is not None:
                     url = ' | ' + RELEASE_URL.format(mbid)
