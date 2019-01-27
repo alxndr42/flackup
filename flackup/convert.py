@@ -2,6 +2,7 @@ from collections import namedtuple
 import io
 import os
 import os.path
+import re
 import shutil
 import tempfile
 import wave
@@ -11,6 +12,7 @@ from PIL import Image
 from flackup.fileinfo import Picture
 
 
+ESC_RE = re.compile(r'[^-\w ,&()]')
 TRACK_WAV = 'track-{:02d}.wav'
 
 
@@ -24,14 +26,10 @@ class ConversionError(Exception):
 
 def prepare_tracks(fileinfo, base_dir, fmt):
     """Return a list of Tracks to be encoded."""
-    def sub(filename):
-        """Substitute unsafe/forbidden characters in the filename."""
-        filename = filename.replace('/', '_')
-        filename = filename.replace('\\', '_')
-        filename = filename.replace(':', '_')
-        filename = filename.replace('?', '_')
-        filename = filename.replace('.', '_')
-        filename = filename.strip(' ')
+    def esc(filename):
+        """Escape non-whitelisted characters in the filename."""
+        filename = ESC_RE.sub('_', filename)
+        filename = filename.strip(' _')
         return filename
 
     tracks = []
@@ -43,7 +41,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         album_tags['DATE'] = album_tags['DATE'][:4]
     album_artist = album_tags['ARTIST']
     album_title = album_tags['ALBUM']
-    dst_base = os.path.join(base_dir, sub(album_artist), sub(album_title))
+    dst_base = os.path.join(base_dir, esc(album_artist), esc(album_title))
     for track in cuesheet.audio_tracks:
         track_tags = fileinfo.tags.track_tags(track.number)
         if track_tags.get('HIDE') == 'true':
@@ -51,7 +49,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         track_title = track_tags.get('TITLE')
         if track_title is None:
             track_title = 'Untitled'
-        dst_name = '{:02d} {}.{}'.format(track.number, sub(track_title), fmt)
+        dst_name = '{:02d} {}.{}'.format(track.number, esc(track_title), fmt)
         if 'DISC' in album_tags:
             dst_name = '{}-{}'.format(album_tags['DISC'], dst_name)
         dst_path = os.path.join(dst_base, dst_name)
