@@ -6,11 +6,12 @@ verify_ssl = true
 [packages]
 musicbrainzngs = "*"
 mutagen = "*"
-pycodestyle = "*"
-pytest = "*"
-pytest-datadir = "*"
-pytest-runner = "*"
 click = "*"
 pillow = "*"
 
 [dev-packages]
+pycodestyle = "*"
+pytest = "*"
+pytest-datadir = "*"
+pytest-runner = "*"
+twine = "*"
