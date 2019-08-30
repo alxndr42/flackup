@@ -42,6 +42,7 @@ def prepare_tracks(fileinfo, base_dir, fmt):
     album_artist = album_tags['ARTIST']
     album_title = album_tags['ALBUM']
     dst_base = os.path.join(base_dir, esc(album_artist), esc(album_title))
+    set_album_artist = False
     for track in cuesheet.audio_tracks:
         track_tags = fileinfo.tags.track_tags(track.number)
         if track_tags.get('HIDE') == 'true':
@@ -56,9 +57,12 @@ def prepare_tracks(fileinfo, base_dir, fmt):
         tags = dict(album_tags)
         track_artist = track_tags.get('ARTIST')
         if track_artist is not None and track_artist != album_artist:
-            tags['ALBUMARTIST'] = album_artist
+            set_album_artist = True
         tags.update(track_tags)
         tracks.append(Track(track.number, dst_path, tags))
+    if set_album_artist:
+        for track in tracks:
+            track.tags['ALBUMARTIST'] = album_artist
     return tracks
 
 
