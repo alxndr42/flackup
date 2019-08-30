@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.2
+
+* Fix album artist usage
+* Change filename escaping to whitelist
+* Add --hidden option for analyze
+* Add release country information
+
 ## 0.6.1
 * Additional filename escaping
 
