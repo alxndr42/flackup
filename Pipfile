@@ -4,9 +4,9 @@ name = "pypi"
 verify_ssl = true
 
 [packages]
+click = "*"
 musicbrainzngs = "*"
 mutagen = "*"
-click = "*"
 pillow = "*"
 
 [dev-packages]

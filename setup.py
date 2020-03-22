@@ -98,10 +98,10 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'click>=7',
-        'musicbrainzngs>=0.6',
-        'mutagen>=1.40',
-        'pillow>=6.2.0',
+        'click>=7.1',
+        'musicbrainzngs>=0.7',
+        'mutagen>=1.44',
+        'pillow>=7.0',
     ],  # Optional
 
     # List additional groups of dependencies here (e.g. development
