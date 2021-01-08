@@ -100,8 +100,8 @@ setup(
     install_requires=[
         'click>=7.1',
         'musicbrainzngs>=0.7',
-        'mutagen>=1.44',
-        'pillow>=7.0',
+        'mutagen>=1.45',
+        'pillow>=8.1',
     ],  # Optional
 
     # List additional groups of dependencies here (e.g. development

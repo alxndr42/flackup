@@ -12,7 +12,7 @@ individual [Ogg Vorbis][] tracks.
 
 ## Installation
 
-Using pip (or [pipsi][]):
+Using pip (or [pipx][]):
 
     pip install flackup
 
@@ -43,4 +43,4 @@ You can get help for all commands with the `-h` parameter:
 [cuesheet]: https://xiph.org/flac/documentation_tools_flac.html#encoding_options
 [musicbrainz]: https://musicbrainz.org/
 [ogg vorbis]: https://xiph.org/vorbis/
-[pipsi]: https://github.com/mitsuhiko/pipsi
+[pipx]: https://pipxproject.github.io/pipx/

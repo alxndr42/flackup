@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.4
+
+* Update dependencies
+
 ## 0.6.3
 
 * Update dependencies
