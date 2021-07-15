@@ -7,12 +7,12 @@ from flackup.fileinfo import FileInfo
 from flackup.musicbrainz import MusicBrainz, MusicBrainzError
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 FRONT_COVER_TYPE = 3
+
 RELEASE_URL = 'https://musicbrainz.org/release/{}'
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group()
 def flackup():
     """FLAC CD Backup Manager"""
     pass
@@ -252,12 +252,11 @@ def convert(flac, output_dir, hidden):
             continue
         if any(map(lambda t: os.path.exists(t.path), tracks)):
             continue
-        click.echo('========================================')
         click.echo('{} {}'.format(summary, path))
         try:
-            click.echo('----- Decoding tracks ------------------')
+            click.echo('- Decoding tracks')
             tempdir = fc.decode_tracks(info)
-            click.echo('----- Encoding tracks ------------------')
+            click.echo('- Encoding tracks')
             fc.encode_tracks(tracks, tempdir, 'ogg')
         except fc.ConversionError as e:
             click.echo('ERROR {}'.format(e))
@@ -266,3 +265,7 @@ def convert(flac, output_dir, hidden):
         if front is not None:
             dst_base = os.path.dirname(tracks[0].path)
             fc.export_cover(front, dst_base)
+
+
+if __name__ == '__main__':
+    flackup()

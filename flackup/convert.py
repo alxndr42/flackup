@@ -81,7 +81,7 @@ def decode_tracks(fileinfo):
     tempdir = tempfile.TemporaryDirectory(prefix='flackup-')
     flac = fileinfo.path
     wav = os.path.join(tempdir.name, 'flackup.wav')
-    res = os.system('flac -d {} -o {}'.format(quote(flac), quote(wav)))
+    res = os.system('flac -s -d {} -o {}'.format(quote(flac), quote(wav)))
     exit = res >> 8
     if exit != 0:
         raise ConversionError('Non-zero exit status.')
@@ -100,6 +100,7 @@ def decode_tracks(fileinfo):
                 continue
             out_name = TRACK_WAV.format(number)
             out_path = os.path.join(tempdir.name, out_name)
+            wave_in.setpos(start)
             with wave.open(out_path, 'wb') as wave_out:
                 wave_out.setnchannels(stream.channels)
                 wave_out.setsampwidth(stream.sample_bits // 8)
@@ -130,6 +131,7 @@ def encode_ogg(track, src_path):
     tags = track.tags
     cmd = [
         'oggenc',
+        '-Q',
         '-q 6',
         '-o {}'.format(quote(track.path)),
         '--utf8',
@@ -161,6 +163,7 @@ def replaygain_ogg(tracks):
 
     cmd = [
         'vorbisgain',
+        '-q',
         '-a',
     ]
     for track in tracks:
