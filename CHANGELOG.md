@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.5
+
+* Fix bug when decoding files with hidden tracks
+* Run external tools silently
+
 ## 0.6.4
 
 * Update dependencies
