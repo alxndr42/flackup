@@ -71,7 +71,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Topic :: Multimedia :: Sound/Audio :: CD Audio',
         'Topic :: Multimedia :: Sound/Audio :: Conversion',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',  # noqa
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -98,10 +98,10 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'click>=7.1',
+        'click>=8.0',
         'musicbrainzngs>=0.7',
         'mutagen>=1.45',
-        'pillow>=8.1',
+        'pillow>=8.3',
     ],  # Optional
 
     # List additional groups of dependencies here (e.g. development
