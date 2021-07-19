@@ -65,31 +65,56 @@ def analyze(flac, verbose, hidden):
 
 @flackup.command()
 @click.argument('flac', type=click.Path(exists=True, dir_okay=False), nargs=-1)
-@click.option('--mbid', help='Use this MBID for release metadata.')
-def tag(flac, mbid):
-    """Tag FLAC files."""
+@click.option('--mbid',
+              help='Use this MBID for release metadata.')
+@click.option('--hide',
+              help='Add an album-level HIDE tag.',
+              is_flag=True)
+@click.option('--unhide',
+              help='Remove an album-level HIDE tag.',
+              is_flag=True)
+def tag(flac, mbid, hide, unhide):
+    """Tag FLAC files.
+
+    Files with a cue sheet but no album/track-level tags will be tagged using
+    metadata from MusicBrainz.
+    """
     mb = MusicBrainz()
     for path in flac:
         info = FileInfo(path)
         summary = info.summary
         if not summary.parse_ok or not summary.cuesheet:
             continue
-        if summary.album_tags and summary.track_tags:
+        tagged = summary.album_tags or summary.track_tags
+        album_edit = hide or unhide
+        if tagged and not album_edit:
             continue
         click.echo('{} {}'.format(summary, path))
-        try:
-            if mbid is None:
-                release = find_release(mb, info)
-            else:
-                release = mb.release_by_id(mbid, info.cuesheet)
-            if release is None:
+        album_changed = False
+        track_changed = False
+        # Query MusicBrainz
+        if not tagged:
+            try:
+                if mbid is None:
+                    release = find_release(mb, info)
+                else:
+                    release = mb.release_by_id(mbid, info.cuesheet)
+                if release is None:
+                    continue
+                original_date = mb.first_release_date(release['group-id'])
+            except MusicBrainzError:
+                click.echo('- Error while querying MusicBrainz')
                 continue
-            original_date = mb.first_release_date(release['group-id'])
-        except MusicBrainzError:
-            click.echo('- Error while querying MusicBrainz')
-            continue
-        album_changed = update_album_tags(info, release, original_date)
-        track_changed = update_track_tags(info, release)
+            album_changed |= update_album_tags(info, release, original_date)
+            track_changed |= update_track_tags(info, release)
+        # Hide or unhide album
+        tags = info.tags.album_tags()
+        if hide:
+            tags['HIDE'] = 'true'
+        if unhide:
+            tags.pop('HIDE', None)
+        album_changed |= info.tags.update_album(tags)
+        # Save any changes
         if album_changed or track_changed:
             info.update()
 
@@ -233,7 +258,7 @@ def cover(flac):
               type=click.Path(exists=True, file_okay=False, writable=True),
               default='.')
 @click.option('--hidden',
-              help='Convert albums with a HIDE=true tag.',
+              help='Convert only albums with a HIDE=true tag.',
               is_flag=True)
 def convert(flac, output_dir, hidden):
     """Convert FLAC files."""
