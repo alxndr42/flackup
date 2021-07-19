@@ -27,7 +27,7 @@ _VERSION_TAG = 'FLACKUP_VERSION'
 
 """A subset of FLAC stream information data.
 
-See also: https://xiph.org/flac/format.html#metadata_block_streaminfo
+See: https://xiph.org/flac/format.html#metadata_block_streaminfo
 """
 StreamInfo = namedtuple(
     'StreamInfo', 'channels sample_bits sample_rate sample_count')
@@ -35,7 +35,7 @@ StreamInfo = namedtuple(
 
 """A subset of FLAC cue sheet track data.
 
-See also: https://xiph.org/flac/format.html#cuesheet_track
+See: https://xiph.org/flac/format.html#cuesheet_track
 """
 CueSheetTrack = namedtuple('CueSheetTrack', 'number offset type')
 
@@ -46,7 +46,7 @@ class CueSheet(object):
     Variables:
     - tracks: List of CueSheetTrack instances, including lead-out.
 
-    See also: https://xiph.org/flac/format.html#metadata_block_cuesheet
+    See: https://xiph.org/flac/format.html#metadata_block_cuesheet
     """
 
     def __init__(self, mutagen_cuesheet):
@@ -77,7 +77,7 @@ class Tags(object):
 
     This class supports only one string value per tag.
 
-    See also: https://www.xiph.org/vorbis/doc/v-comment.html
+    See: https://www.xiph.org/vorbis/doc/v-comment.html
     """
 
     def __init__(self, mutagen_tags):
@@ -92,7 +92,10 @@ class Tags(object):
 
     def track_tags(self, number):
         """Return a dictionary of track-level tags."""
-        prefix = 'TRACK_{:02d}_'.format(int(number))
+        num = int(number)
+        if num < 1 or num > 99:
+            raise Exception(f'Invalid track number: {number}')
+        prefix = 'TRACK_{:02d}_'.format(num)
         return self._collect_tags(prefix, *TRACK_TAGS)
 
     def update_album(self, tags):
@@ -107,7 +110,10 @@ class Tags(object):
 
         Returns True if anything changed.
         """
-        prefix = 'TRACK_{:02d}_'.format(int(number))
+        num = int(number)
+        if num < 1 or num > 99:
+            raise Exception(f'Invalid track number: {number}')
+        prefix = 'TRACK_{:02d}_'.format(num)
         return self._update_tags(tags, prefix, *TRACK_TAGS)
 
     def _collect_tags(self, prefix, *args):
@@ -141,7 +147,7 @@ class Tags(object):
 
 """A subset of FLAC picture data.
 
-See also: https://xiph.org/flac/format.html#metadata_block_picture
+See: https://xiph.org/flac/format.html#metadata_block_picture
 """
 Picture = namedtuple('Picture', 'type mime width height depth data')
 
@@ -149,19 +155,19 @@ Picture = namedtuple('Picture', 'type mime width height depth data')
 class Summary():
     """A summary for a FileInfo object.
 
-       Flags:
-       - parse_ok: The file parsed successfully.
-       - cuesheet: A cue sheet is present.
-       - album_tags: Album-level tags are present (any number).
-       - track_tags: Track-level tags are present (any number).
-       - pictures: Pictures are present (any number).
+   Flags:
+   - parse_ok: The file parsed successfully.
+   - cuesheet: A cue sheet is present.
+   - album_tags: Album-level tags are present (any number).
+   - track_tags: Track-level tags are present (any number).
+   - pictures: Pictures are present (any number).
 
-       The string representation uses the following flags:
-        - O: The file parsed successfully.
-        - C: A cue sheet is present.
-        - A: Album-level tags are present (any number).
-        - T: Track-level tags are present (any number).
-        - P: Pictures are present (any number).
+   The string representation uses the following flags:
+    - O: The file parsed successfully.
+    - C: A cue sheet is present.
+    - A: Album-level tags are present (any number).
+    - T: Track-level tags are present (any number).
+    - P: Pictures are present (any number).
     """
 
     def __init__(self, fileinfo):
@@ -206,9 +212,10 @@ class FileInfo(object):
     Variables:
     - path: The FLAC file.
     - parse_ok: True if the file was parsed successfully.
-                If False, cuesheet and tags will be None.
+                If False, most other variables will be None.
     - parse_exception: The exception raised during parsing, or None.
-    - cuesheet: The file's CueSheet, or None.
+    - streaminfo: The file's StreamInfo.
+    - cuesheet: The file's CueSheet.
     - tags: The file's Tags.
 
     This class supports only one picture per type.

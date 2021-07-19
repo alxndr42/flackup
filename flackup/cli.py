@@ -73,7 +73,15 @@ def analyze(flac, verbose, hidden):
 @click.option('--unhide',
               help='Remove an album-level HIDE tag.',
               is_flag=True)
-def tag(flac, mbid, hide, unhide):
+@click.option('-t', '--hide-track',
+              help='Add a track-level HIDE tag.',
+              type=int,
+              multiple=True)
+@click.option('-T', '--unhide-track',
+              help='Remove a track-level HIDE tag.',
+              type=int,
+              multiple=True)
+def tag(flac, mbid, hide, unhide, hide_track, unhide_track):
     """Tag FLAC files.
 
     Files with a cue sheet but no album/track-level tags will be tagged using
@@ -87,7 +95,8 @@ def tag(flac, mbid, hide, unhide):
             continue
         tagged = summary.album_tags or summary.track_tags
         album_edit = hide or unhide
-        if tagged and not album_edit:
+        track_edit = hide_track or unhide_track
+        if tagged and not (album_edit or track_edit):
             continue
         click.echo('{} {}'.format(summary, path))
         album_changed = False
@@ -114,6 +123,15 @@ def tag(flac, mbid, hide, unhide):
         if unhide:
             tags.pop('HIDE', None)
         album_changed |= info.tags.update_album(tags)
+        # Hide or unhide tracks
+        for number in hide_track:
+            tags = info.tags.track_tags(number)
+            tags['HIDE'] = 'true'
+            track_changed |= info.tags.update_track(number, tags)
+        for number in unhide_track:
+            tags = info.tags.track_tags(number)
+            tags.pop('HIDE', None)
+            track_changed |= info.tags.update_track(number, tags)
         # Save any changes
         if album_changed or track_changed:
             info.update()
