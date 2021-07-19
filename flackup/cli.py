@@ -2,6 +2,7 @@ import os.path
 
 import click
 
+from flackup import VERSION
 import flackup.convert as fc
 from flackup.fileinfo import FileInfo
 from flackup.musicbrainz import MusicBrainz, MusicBrainzError
@@ -27,7 +28,7 @@ def flackup():
 def analyze(flac, verbose, hidden):
     """Analyze FLAC files.
 
-    For each file, prints a list of flags followed by the filename.
+    For each file, shows a list of flags followed by the filename.
 
     \b
     Flags:
@@ -308,6 +309,12 @@ def convert(flac, output_dir, hidden):
         if front is not None:
             dst_base = os.path.dirname(tracks[0].path)
             fc.export_cover(front, dst_base)
+
+
+@flackup.command()
+def version():
+    """Show the version number."""
+    click.echo(VERSION)
 
 
 if __name__ == '__main__':

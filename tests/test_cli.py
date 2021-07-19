@@ -1,5 +1,6 @@
 from click.testing import CliRunner
 
+from flackup import VERSION
 from flackup.cli import flackup
 from flackup.fileinfo import FileInfo
 
@@ -45,3 +46,14 @@ class TestTag(object):
         info = FileInfo(path)
         assert result.exit_code == 0
         assert info.tags.track_tags(3).get('HIDE') is None
+
+
+class TestVersion(object):
+    """Test the version command."""
+
+    def test_version(self):
+        """Test the version command."""
+        runner = CliRunner()
+        result = runner.invoke(flackup, ['version'])
+        assert result.exit_code == 0
+        assert result.output.strip() == VERSION
