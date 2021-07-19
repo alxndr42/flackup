@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+* Add album/track-level hide/unhide options
+* Add version command
+
 ## 0.6.5
 
 * Fix bug when decoding files with hidden tracks
