@@ -101,7 +101,7 @@ setup(
         'click>=8.0',
         'musicbrainzngs>=0.7',
         'mutagen>=1.45',
-        'pillow>=8.3',
+        'pillow>=9.0',
     ],  # Optional
 
     # List additional groups of dependencies here (e.g. development
