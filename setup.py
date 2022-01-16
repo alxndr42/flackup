@@ -50,7 +50,7 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/7adietri/flackup',  # Optional
+    url='https://github.com/alxndr42/flackup',  # Optional
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -68,7 +68,6 @@ setup(
     # For a list of valid classifiers, see
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[  # Optional
-        'Development Status :: 4 - Beta',
         'Topic :: Multimedia :: Sound/Audio :: CD Audio',
         'Topic :: Multimedia :: Sound/Audio :: Conversion',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',  # noqa

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+* Update dependencies
+
 ## 0.7.0
 
 * Add album/track-level hide/unhide options
