@@ -2,7 +2,7 @@ import os.path
 
 import click
 
-from flackup import VERSION
+from flackup import NAME, VERSION
 import flackup.convert as fc
 from flackup.fileinfo import FileInfo
 from flackup.musicbrainz import MusicBrainz, MusicBrainzError
@@ -312,9 +312,24 @@ def convert(flac, output_dir, hidden):
 
 
 @flackup.command()
-def version():
-    """Show the version number."""
-    click.echo(VERSION)
+@click.option(
+    '--dependencies', '-d',
+    help='Check the dependencies.',
+    is_flag=True)
+def version(dependencies):
+    """Show the version information."""
+    click.echo(f'{NAME} {VERSION}')
+    if not dependencies:
+        return
+    # flac_version FLAC.version()
+    # if age_version:
+    #     click.echo(f'✅ age found. (Version: {age_version})')
+    # else:
+    #     click.echo(f'❌ age not found.')
+    # if age_keygen:
+    #     click.echo(f'✅ age-keygen found.')
+    # else:
+    #     click.echo(f'❌ age-keygen not found.')
 
 
 if __name__ == '__main__':
