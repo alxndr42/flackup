@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from flackup import VERSION
+from flackup import NAME, VERSION
 from flackup.cli import flackup
 from flackup.fileinfo import FileInfo
 
@@ -56,4 +56,4 @@ class TestVersion(object):
         runner = CliRunner()
         result = runner.invoke(flackup, ['version'])
         assert result.exit_code == 0
-        assert result.output.strip() == VERSION
+        assert result.output.strip() == f'{NAME} {VERSION}'

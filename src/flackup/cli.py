@@ -312,24 +312,21 @@ def convert(flac, output_dir, hidden):
 
 
 @flackup.command()
-@click.option(
-    '--dependencies', '-d',
-    help='Check the dependencies.',
-    is_flag=True)
-def version(dependencies):
+# @click.option(
+#     '--dependencies', '-d',
+#     help='Check the dependencies.',
+#     is_flag=True)
+# def version(dependencies):
+def version():
     """Show the version information."""
     click.echo(f'{NAME} {VERSION}')
-    if not dependencies:
-        return
-    # flac_version FLAC.version()
-    # if age_version:
-    #     click.echo(f'✅ age found. (Version: {age_version})')
+    # if not dependencies:
+    #     return
+    # flac_version = FLAC.version()
+    # if flac_version:
+    #     click.echo(f'✅ flac found. (Version: {flac_version})')
     # else:
-    #     click.echo(f'❌ age not found.')
-    # if age_keygen:
-    #     click.echo(f'✅ age-keygen found.')
-    # else:
-    #     click.echo(f'❌ age-keygen not found.')
+    #     click.echo(f'❌ flac not found.')
 
 
 if __name__ == '__main__':
