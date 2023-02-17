@@ -16,3 +16,6 @@ pytest = "*"
 pytest-datadir = "*"
 pytest-runner = "*"
 twine = "*"
+
+[requires]
+python_version = "3.8"

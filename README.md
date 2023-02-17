@@ -12,7 +12,7 @@ individual [Ogg Vorbis][] tracks.
 
 - FLAC files with embedded cue sheets
 - `flac`, `oggenc` and `vorbisgain`
-- Python 3
+- Python 3.8
 
 ## Installation
 
