@@ -1,4 +1,6 @@
 import os.path
+import shutil
+import subprocess
 
 import click
 
@@ -312,21 +314,37 @@ def convert(flac, output_dir, hidden):
 
 
 @flackup.command()
-# @click.option(
-#     '--dependencies', '-d',
-#     help='Check the dependencies.',
-#     is_flag=True)
-# def version(dependencies):
-def version():
+@click.option(
+    '--dependencies', '-d',
+    help='Check the dependencies.',
+    is_flag=True)
+def version(dependencies):
     """Show the version information."""
     click.echo(f'{NAME} {VERSION}')
-    # if not dependencies:
-    #     return
-    # flac_version = FLAC.version()
-    # if flac_version:
-    #     click.echo(f'✅ flac found. (Version: {flac_version})')
-    # else:
-    #     click.echo(f'❌ flac not found.')
+    if not dependencies:
+        return
+    for cmd in ['flac', 'oggenc', 'vorbisgain']:
+        cmd_version = get_version(cmd)
+        if cmd_version:
+            click.echo(f'✅ {cmd} found. ({cmd_version})')
+        else:
+            click.echo(f'❌ {cmd} not found.')
+
+
+def get_version(command, parameter='--version'):
+    """Return the command's version string, or None."""
+    path = shutil.which(command)
+    if path:
+        res = subprocess.run(
+            [command, parameter],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=5)
+    if path and res.returncode == 0:
+        return res.stdout.strip()
+    else:
+        return None
 
 
 if __name__ == '__main__':
