@@ -4,7 +4,7 @@ Flackup manages audio CD backups as single FLAC files with [embedded cue
 sheets][cuesheet], adds metadata from [MusicBrainz][] and converts albums to
 individual [Ogg Vorbis][] tracks.
 
-[cuesheet]: https://xiph.org/flac/documentation_tools_flac.html#encoding_options
+[cuesheet]: https://xiph.org/flac/format.html#format_overview
 [musicbrainz]: https://musicbrainz.org/
 [ogg vorbis]: https://xiph.org/vorbis/
 
