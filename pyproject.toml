@@ -1,6 +1,36 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[project]
+name = "flackup"
+authors = [{name = "Alexander Dietrich", email = "alexander@dietrich.cx"}]
+description = "FLAC CD Backup Manager"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: CD Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Conversion",
 ]
+dependencies = [
+    "click ~= 8.0",
+    "musicbrainzngs ~= 0.7",
+    "mutagen ~= 1.45",
+    "pillow ~= 9.0",
+]
+dynamic = ["version"]
+
+[project.scripts]
+flackup = "flackup.cli:flackup"
+
+[project.urls]
+Homepage = "https://codeberg.org/alxndr42/flackup"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+
+[tool.setuptools.dynamic]
+version = {attr = "flackup.VERSION"}
+
+[build-system]
+requires = ["setuptools~=68.0", "setuptools-scm~=7.1"]
 build-backend = "setuptools.build_meta"
