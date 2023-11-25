@@ -12,10 +12,10 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Conversion",
 ]
 dependencies = [
-    "click ~= 8.0",
+    "click ~= 8.1",
     "musicbrainzngs ~= 0.7",
-    "mutagen ~= 1.45",
-    "pillow ~= 9.0",
+    "mutagen ~= 1.47",
+    "pillow ~= 10.1",
 ]
 dynamic = ["version"]
 
