@@ -12,7 +12,7 @@ individual [Ogg Vorbis][] tracks.
 
 - FLAC files with embedded cue sheets
 - `flac`, `oggenc` and `vorbisgain`
-- Python 3.8
+- Python 3.10 or later
 
 ## Installation
 
@@ -50,3 +50,13 @@ directory:
 ```bash
 flackup convert -d $HOME/Music *.flac
 ```
+
+To show the version number and check the dependencies:
+
+```bash
+flackup version -d
+```
+
+---
+
+Trans Rights are Human Rights! 🏳️‍⚧️ 🏳️‍🌈

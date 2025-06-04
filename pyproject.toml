@@ -3,19 +3,19 @@ name = "flackup"
 authors = [{name = "Alexander Dietrich", email = "alexander@dietrich.cx"}]
 description = "FLAC CD Backup Manager"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10" # .python-version
+license = "GPL-3.0-or-later"
 classifiers = [
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Multimedia :: Sound/Audio :: CD Audio",
     "Topic :: Multimedia :: Sound/Audio :: Conversion",
 ]
 dependencies = [
-    "click ~= 8.1",
+    "click ~= 8.2",
     "musicbrainzngs ~= 0.7",
     "mutagen ~= 1.47",
-    "pillow ~= 10.4",
+    "pillow ~= 11.2",
 ]
 dynamic = ["version"]
 
@@ -32,5 +32,5 @@ pythonpath = "src"
 version = {attr = "flackup.VERSION"}
 
 [build-system]
-requires = ["setuptools~=68.0", "setuptools-scm~=7.1"]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
